@@ -360,6 +360,15 @@ h2 {
     opacity: 0.7;
     cursor: not-allowed;
 }
+
+.btn-primary.loading {
+    animation: pulse 0.8s ease-in-out infinite alternate;
+    background: #2563eb;
+}
+
+.btn-primary.loading .btn-text {
+    opacity: 0.9;
+}
  
 /* Spinner que aparece dentro del botón */
 .btn-primary .spinner {
@@ -379,4 +388,9 @@ h2 {
  
 .btn-primary.loading .btn-text {
     opacity: 0.8;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.02); }
 }

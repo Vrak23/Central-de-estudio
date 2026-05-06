@@ -47,10 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <script>
-document.querySelector('.login-form').addEventListener('submit', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('.login-form');
     const btn = document.getElementById('btn-login');
-    btn.classList.add('loading');
-    btn.disabled = true;
+    const btnText = btn ? btn.querySelector('.btn-text') : null;
+
+    if (!form || !btn) return;
+
+    form.addEventListener('submit', function () {
+        btn.classList.add('loading');
+        btn.disabled = true;
+        if (btnText) {
+            btnText.textContent = 'Ingresando...';
+        }
+    });
 });
 </script>
 
