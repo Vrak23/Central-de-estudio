@@ -1,0 +1,327 @@
+/* css/style/styles.css */
+:root {
+    --bg-color: #0f1115;
+    --card-bg: #1a1d23;
+    --accent-color: #3b82f6;
+    --text-main: #e2e8f0;
+    --text-dim: #94a3b8;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    padding: 2rem;
+    border-bottom: 1px solid #2d3748;
+}
+
+.welcome-msg { 
+    font-size: 0.9rem; 
+    color: var(--accent-color); 
+    font-weight: 600; 
+    margin-bottom: 0.5rem; 
+}
+
+h1 { 
+    margin: 0; 
+    font-size: 1.8rem; 
+}
+
+.date-time { 
+    color: var(--text-dim); 
+    font-size: 0.85rem; 
+}
+
+.container { 
+    padding: 2rem; 
+    flex-grow: 1; 
+}
+
+.grid {
+    display: grid;
+    /* Forzamos 4 columnas iguales en pantallas de escritorio */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Centrado total dentro de las tarjetas */
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #2d3748;
+    transition: transform 0.2s, border-color 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra horizontalmente */
+    text-align: center;  /* Centra el texto */
+    min-height: 250px;   /* Altura uniforme para todas */
+    justify-content: space-between;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+}
+
+.card-type { 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    color: var(--text-dim); 
+}
+
+.card-title { 
+    font-size: 1.2rem; 
+    font-weight: 600; 
+    margin: 0.5rem 0; /* 0.5rem arriba/abajo, 0 a los lados */
+    color: var(--accent-color); 
+}
+
+.db-badge {
+    display: inline-block;
+    background: #1e293b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-top: 10px;
+}
+
+footer {
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    border-top: 1px solid #2d3748;
+}
+
+.logout-btn {
+    color: #ef4444;
+    text-decoration: none;
+    font-weight: 600;
+    float: right;
+}
+/* Espaciado extra para los títulos de sección */
+h2 {
+    border-left: 4px solid var(--accent-color);
+    padding-left: 15px;
+    margin-top: 2rem;
+}
+
+/* Efecto visual de "Selección" en las tarjetas */
+.card:active {
+    transform: scale(0.98);
+    background: #23272e;
+}
+.grid-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.selection-card {
+    background: var(--card-bg);
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid #2d3748;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selection-card:hover {
+    border-color: var(--accent-color);
+    background: #1e2229;
+    transform: translateY(-10px);
+}
+
+.selection-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+.back-btn {
+    background: none;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.back-btn:hover { background: var(--accent-color); color: white; }
+/* Contenedor del logo */
+.card-logo {
+    width: 100%;       /* Ocupa el ancho de la tarjeta */
+    height: 100px;     /* Altura fija para que todos sean iguales */
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    margin-bottom: 1rem;
+    overflow: hidden;  /* Corta cualquier cosa que se salga */
+}
+
+/* La imagen dentro del contenedor */
+.card-logo img {
+    max-width: 80px;   /* Limita el ancho máximo */
+    max-height: 80px;  /* Limita la altura máxima */
+    object-fit: contain; /* Mantiene la proporción sin estirarse */
+    transition: transform 0.3s ease;
+}
+
+/* Efecto opcional: que el logo crezca un poquito al pasar el mouse */
+.card:hover .card-logo img {
+    transform: scale(1.1);
+}
+/* Estilo para el botón de regreso */
+.back-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.back-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    transform: translateX(-5px);
+}
+
+/* ===== LOGIN MEJORADO ===== */
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at top, #1a1d23, #0f1115);
+}
+
+/* contenedor externo para centrar mejor */
+.login-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* tarjeta */
+.login-container {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 380px;
+    border: 1px solid #2d3748;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    animation: fadeIn 0.4s ease;
+}
+
+/* títulos */
+.login-title {
+    text-align: center;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    margin-bottom: 1.8rem;
+    font-size: 0.9rem;
+}
+
+/* form */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    color: var(--text-dim);
+}
+
+/* inputs */
+.form-group input {
+    background: #0f1115;
+    border: 1px solid #2d3748;
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--text-main);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+/* botón */
+.btn-primary {
+    background: var(--accent-color);
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59,130,246,0.3);
+}
+
+/* error */
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #f87171;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* animación */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
