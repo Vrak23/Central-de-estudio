@@ -45,6 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
+<script>
+document.querySelector('.login-form').addEventListener('submit', function() {
+    const btn = document.getElementById('btn-login');
+    btn.classList.add('loading');
+    btn.disabled = true;
+});
+</script>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -83,8 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         required>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    Ingresar
+                <button type="submit" class="btn-primary" id="btn-login">
+                    <span class="spinner"></span>
+                    <span class="btn-text">Ingresar</span>
                 </button>
 
             </form>
