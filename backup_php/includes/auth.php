@@ -4,6 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: ' . dirname($_SERVER['PHP_SELF']) . '/login.php');
+    header('Location: login.php');
     exit;
 }

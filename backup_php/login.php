@@ -2,11 +2,11 @@
 session_start();
 
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: /portal_gen/central/index.php');
+    header('Location: index.php');
     exit;
 }
 
-require_once 'config/db.php';
+require_once __DIR__ . '/config/db.php';
 
 $error = '';
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['usuario_nombre'] = $usuario['nombres'] . ' ' . $usuario['apellidos'];
                     $_SESSION['usuario_email']  = $email;
                     session_write_close();
-                    header('Location: /portal_gen/central/index.php');
+                    header('Location: index.php');
                     exit;
                 } else {
                     $error = 'Su cuenta está desactivada. Contacte al administrador.';

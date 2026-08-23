@@ -1,7 +1,7 @@
 <div class="container">
     <!-- PANTALLA DE SELECCIÓN INICIAL -->
     <div class="selection-screen" id="main-selection">
-        <h2 style="text-align: center; color: var(--text-dim); margin-bottom: 2rem; border: none;">
+        <h2 style="text-align:center; color:var(--text-dim); margin-bottom:2rem; border:none;">
             ¿A dónde vamos hoy, <?php echo isset($_SESSION['usuario_nombre']) ? htmlspecialchars(explode(' ', $_SESSION['usuario_nombre'])[0]) : 'Usuario'; ?>?
         </h2>
         <div class="grid-selection">
@@ -20,7 +20,7 @@
 
     <!-- SECCIÓN DE PORTALES -->
     <div id="senati-section" class="content-section" style="display:none;">
-        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem;">
             <button onclick="hideSections()" class="back-btn">← Volver al Menú</button>
             <button onclick="abrirModal()" class="add-btn">+ Agregar sitio</button>
         </div>
@@ -56,24 +56,27 @@
         <div class="grid" id="grid-sitios">
             <?php if (!empty($sitios)): ?>
                 <?php foreach ($sitios as $sitio): ?>
-                    <div class="card card-custom" id="sitio-<?php echo $sitio['id']; ?>">
-                        <button class="btn-eliminar" onclick="eliminarSitio(<?php echo $sitio['id']; ?>)" title="Eliminar">✕</button>
-                        <a href="<?php echo htmlspecialchars($sitio['url']); ?>" target="_blank" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center;">
-                            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;"><?php echo htmlspecialchars($sitio['icono']); ?></div>
+                    <div class="card card-custom" id="sitio-<?php echo (int)$sitio['id']; ?>">
+                        <button class="btn-eliminar"
+                                onclick="eliminarSitio(<?php echo (int)$sitio['id']; ?>)"
+                                title="Eliminar">✕</button>
+                        <a href="<?php echo htmlspecialchars($sitio['url']); ?>" target="_blank"
+                           style="text-decoration:none; color:inherit; display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center;">
+                            <div style="font-size:2.5rem; margin-bottom:0.75rem;"><?php echo htmlspecialchars($sitio['icono']); ?></div>
                             <div class="card-title"><?php echo htmlspecialchars($sitio['nombre']); ?></div>
                             <p style="font-size:0.78rem; color:var(--text-dim); word-break:break-all;"><?php echo htmlspecialchars($sitio['url']); ?></p>
                         </a>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p id="sin-sitios" style="color: var(--text-dim);">Aún no tienes sitios guardados. Agrega uno con el botón de arriba.</p>
+                <p id="sin-sitios" style="color:var(--text-dim);">Aún no tienes sitios guardados. Agrega uno con el botón de arriba.</p>
             <?php endif; ?>
         </div>
     </div>
 
     <!-- SECCIÓN LOCAL -->
     <div id="local-section" class="content-section" style="display:none;">
-        <div style="margin-bottom: 1.5rem;">
+        <div style="margin-bottom:1.5rem;">
             <button onclick="hideSections()" class="back-btn">← Volver al Menú</button>
         </div>
         <h2>LABORATORIO LOCAL</h2>
@@ -87,7 +90,7 @@
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p style="color: var(--text-dim);">No se encontraron proyectos locales.</p>
+                <p style="color:var(--text-dim);">No se encontraron proyectos locales.</p>
             <?php endif; ?>
         </div>
     </div>
@@ -99,30 +102,33 @@
         <h3>Agregar nuevo sitio</h3>
 
         <div class="modal-field">
-            <label>Ícono (emoji)</label>
-            <input type="text" id="input-icono" placeholder="🌐" maxlength="4">
+            <label for="input-categoria">Categoría</label>
+            <!-- name="categoria" agregado: valores exactos 'personal' y 'fijo' -->
+            <select id="input-categoria"
+                    name="categoria"
+                    style="width:100%; background:#0f1115; border:1px solid #2d3748; color:var(--text-main); padding:10px; border-radius:8px;">
+                <option value="personal">Mis Sitios</option>
+                <option value="fijo">Portales Fijos</option>
+            </select>
         </div>
         <div class="modal-field">
-    <label>Categoría</label>
-    <select id="input-categoria" style="width: 100%; background: #0f1115; border: 1px solid #2d3748; color: var(--text-main); padding: 10px; border-radius: 8px;">
-        <option value="personal">Mis Sitios</option>
-        <option value="fijo">Portales Fijos</option>
-    </select>
-</div>
-        <div class="modal-field">
-            <label>Nombre</label>
-            <input type="text" id="input-nombre" placeholder="Ej: Moodle">
+            <label for="input-icono">Ícono (emoji)</label>
+            <input type="text" id="input-icono" name="icono" placeholder="🌐" maxlength="4">
         </div>
         <div class="modal-field">
-            <label>URL</label>
-            <input type="text" id="input-url" placeholder="Ej: https://moodle.senati.edu.pe">
+            <label for="input-nombre">Nombre</label>
+            <input type="text" id="input-nombre" name="nombre" placeholder="Ej: Moodle">
+        </div>
+        <div class="modal-field">
+            <label for="input-url">URL</label>
+            <input type="text" id="input-url" name="url" placeholder="Ej: https://moodle.senati.edu.pe">
         </div>
 
         <p id="form-error" style="color:#ef4444; font-size:0.85rem; margin-top:0.5rem; display:none;"></p>
 
         <div class="modal-actions">
-            <button onclick="agregarSitio()" class="btn-guardar">Guardar</button>
-            <button onclick="cerrarModal()" class="btn-cancelar">Cancelar</button>
+            <button class="btn-guardar" onclick="agregarSitio()">Guardar</button>
+            <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
         </div>
     </div>
 </div>
@@ -132,7 +138,7 @@
 #modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0,0,0,0.75);
     backdrop-filter: blur(4px);
     z-index: 1000;
     display: flex;
@@ -171,7 +177,8 @@
     margin-bottom: 5px;
 }
 
-.modal-field input {
+.modal-field input,
+.modal-field select {
     width: 100%;
     box-sizing: border-box;
     background: #0f1115;
@@ -184,7 +191,8 @@
     transition: border-color 0.2s;
 }
 
-.modal-field input:focus {
+.modal-field input:focus,
+.modal-field select:focus {
     border-color: var(--accent-color);
 }
 
@@ -209,9 +217,10 @@
     cursor: pointer;
     font-weight: 600;
     font-size: 0.95rem;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s;
 }
-.btn-guardar:hover { background: #2563eb; }
+.btn-guardar:hover:not(:disabled) { background: #2563eb; }
+.btn-guardar:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-cancelar {
     background: transparent;
@@ -221,7 +230,7 @@
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.95rem;
-    transition: all 0.2s;
+    transition: color 0.2s, border-color 0.2s;
 }
 .btn-cancelar:hover { color: var(--text-main); border-color: #4a5568; }
 
@@ -264,100 +273,8 @@
     from { opacity: 0; }
     to   { opacity: 1; }
 }
-
 @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
 }
 </style>
-
-<script>
-function abrirModal() {
-    document.getElementById('modal-overlay').style.display = 'flex';
-    setTimeout(() => document.getElementById('input-nombre').focus(), 100);
-}
-
-function cerrarModal() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('input-nombre').value = '';
-    document.getElementById('input-url').value = '';
-    document.getElementById('input-icono').value = '';
-    document.getElementById('form-error').style.display = 'none';
-}
-
-// Cerrar al hacer clic fuera del modal
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-    if (e.target === this) cerrarModal();
-});
-
-// Cerrar con Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') cerrarModal();
-});
-
-function agregarSitio() {
-    const nombre = document.getElementById('input-nombre').value.trim();
-    const url    = document.getElementById('input-url').value.trim();
-    const icono  = document.getElementById('input-icono').value.trim() || '🌐';
-    const error  = document.getElementById('form-error');
-
-    if (!nombre || !url) {
-        error.textContent = 'Nombre y URL son obligatorios.';
-        error.style.display = 'block';
-        return;
-    }
-    error.style.display = 'none';
-
-    const fd = new FormData();
-    fd.append('action', 'agregar');
-    fd.append('nombre', nombre);
-    fd.append('url', url);
-    fd.append('icono', icono);
-
-    fetch('sitios.php', { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
-                const sinSitios = document.getElementById('sin-sitios');
-                if (sinSitios) sinSitios.remove();
-
-                const grid = document.getElementById('grid-sitios');
-                const div = document.createElement('div');
-                div.className = 'card card-custom';
-                div.id = 'sitio-' + data.id;
-                div.innerHTML = `
-                    <button class="btn-eliminar" onclick="eliminarSitio(${data.id})" title="Eliminar">✕</button>
-                    <a href="${data.url}" target="_blank" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center;">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">${data.icono}</div>
-                        <div class="card-title">${data.nombre}</div>
-                        <p style="font-size:0.78rem; color:var(--text-dim); word-break:break-all;">${data.url}</p>
-                    </a>`;
-                grid.appendChild(div);
-                cerrarModal();
-            } else {
-                error.textContent = data.msg;
-                error.style.display = 'block';
-            }
-        });
-}
-
-function eliminarSitio(id) {
-    if (!confirm('¿Eliminar este sitio?')) return;
-
-    const fd = new FormData();
-    fd.append('action', 'eliminar');
-    fd.append('id', id);
-
-    fetch('sitios.php', { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
-                document.getElementById('sitio-' + id).remove();
-                const grid = document.getElementById('grid-sitios');
-                if (grid.children.length === 0) {
-                    grid.innerHTML = '<p id="sin-sitios" style="color: var(--text-dim);">Aún no tienes sitios guardados.</p>';
-                }
-            }
-        });
-}
-</script>
