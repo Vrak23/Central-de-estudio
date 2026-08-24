@@ -202,14 +202,20 @@ footer {
 @media (max-width: 600px) {
   .header-content {
     display: flex;
-    flex-direction: column;
-    text-align: center;
-    gap: 0.8rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 0.5rem;
+  }
+  .header-left {
+    flex: 1;
+    min-width: 0;
   }
   .header-right {
-    justify-content: center;
-    gap: 0.7rem;
-    width: 100%;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
   }
 }
 
