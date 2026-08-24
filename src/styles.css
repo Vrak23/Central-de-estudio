@@ -53,7 +53,7 @@ body::before {
 }
 
 header {
-    padding: 1.5rem 2rem;
+    padding: 0.8rem 1.25rem;
     background: var(--bg-surface);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
@@ -73,36 +73,43 @@ header {
 
 h1 { 
     margin: 0; 
-    font-size: 1.8rem; 
+    font-size: clamp(1.55rem, 2.3vw, 2rem);
+    line-height: 1.05;
 }
 
 .date-time { 
     color: var(--text-dim); 
-    font-size: 0.85rem; 
+    font-size: 0.82rem; 
 }
 
 .container { 
-    width: min(100% - 2rem, 1280px);
-    padding: 2rem 1rem; 
+    width: min(100% - 2.5rem, 1180px);
+    padding: 1.5rem 0; 
     margin: 0 auto;
     flex-grow: 1; 
     box-sizing: border-box;
 }
 
 footer {
-    padding: 1.5rem;
+    padding: 0.65rem 1rem;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: var(--text-dim);
     border-top: 1px solid var(--border);
     margin-top: auto;
 }
 
+footer p {
+    margin: 0;
+}
+
 h2 {
     border-left: 4px solid var(--accent);
-    padding-left: 15px;
-    margin-top: 2rem;
+    padding-left: 0.9rem;
+    margin: 1.6rem 0 1rem;
     color: var(--text-main);
+    font-size: clamp(1.25rem, 2vw, 1.65rem);
+    line-height: 1.15;
 }
 
 button,
@@ -145,4 +152,43 @@ select:focus-visible,
     background: rgba(249, 115, 22, 0.45);
     border: 2px solid rgba(15, 15, 18, 0.9);
     border-radius: 999px;
+}
+
+@media (max-width: 700px) {
+    header {
+        padding: 0.7rem 0.9rem;
+    }
+
+    h1 {
+        font-size: 1.55rem;
+    }
+
+    .date-time {
+        font-size: 0.78rem;
+    }
+
+    .container {
+        width: min(100% - 1.5rem, 1180px);
+        padding: 1rem 0;
+    }
+
+    h2 {
+        font-size: 1.35rem;
+        margin: 1.35rem 0 0.85rem;
+        padding-left: 0.75rem;
+    }
+}
+
+@media (max-width: 420px) {
+    header {
+        padding: 0.65rem 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.38rem;
+    }
+
+    .container {
+        width: min(100% - 1rem, 1180px);
+    }
 }

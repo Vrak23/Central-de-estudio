@@ -120,8 +120,7 @@ export class Dashboard implements OnInit, OnDestroy {
     };
     
     // Traducir a formato español
-    const localeStr = now.toLocaleDateString('es-ES', options);
-    this.dateTimeString = `${localeStr} • Lima, PE`;
+    this.dateTimeString = now.toLocaleDateString('es-ES', options);
   }
 
   async loadSitios() {
