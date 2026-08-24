@@ -55,14 +55,27 @@ export class Dashboard implements OnInit {
     const user = await this.supabaseService.getUser();
     if (user) {
       const profile = await this.supabaseService.getProfile(user.id);
+      let name = '';
+      let lastName = '';
+      
       if (profile) {
-        this.userName = profile.nombres;
-        this.userLastName = profile.apellidos || '';
-      } else {
-        this.userName = user.user_metadata?.['nombres'] || user.email?.split('@')[0] || 'Usuario';
-        this.userLastName = user.user_metadata?.['apellidos'] || '';
+        name = profile.nombres || '';
+        lastName = profile.apellidos || '';
       }
-      this.userInitials = (this.userName[0] + (this.userLastName ? this.userLastName[0] : '')).toUpperCase();
+      
+      if (!name) {
+        name = user.user_metadata?.['nombres'] || user.email?.split('@')[0] || 'Usuario';
+      }
+      if (!lastName) {
+        lastName = user.user_metadata?.['apellidos'] || '';
+      }
+
+      this.userName = name.trim() || user.email?.split('@')[0] || 'Usuario';
+      this.userLastName = lastName.trim() || '';
+      
+      const firstChar = name ? name.trim().charAt(0) : 'U';
+      const secondChar = lastName ? lastName.trim().charAt(0) : '';
+      this.userInitials = (firstChar + secondChar).toUpperCase();
     }
 
     await this.loadSitios();
