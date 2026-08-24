@@ -13,6 +13,8 @@ import { SupabaseService } from '../services/supabase';
 })
 export class Dashboard implements OnInit {
   userName = 'Usuario';
+  userLastName = '';
+  userInitials = 'U';
   dateTimeString = '';
   saludo = 'Hola';
   activeSection = 'main'; // 'main' | 'senati' | 'local'
@@ -55,9 +57,12 @@ export class Dashboard implements OnInit {
       const profile = await this.supabaseService.getProfile(user.id);
       if (profile) {
         this.userName = profile.nombres;
+        this.userLastName = profile.apellidos || '';
       } else {
         this.userName = user.user_metadata?.['nombres'] || user.email?.split('@')[0] || 'Usuario';
+        this.userLastName = user.user_metadata?.['apellidos'] || '';
       }
+      this.userInitials = (this.userName[0] + (this.userLastName ? this.userLastName[0] : '')).toUpperCase();
     }
 
     await this.loadSitios();

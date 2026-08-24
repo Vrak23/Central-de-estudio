@@ -60,13 +60,23 @@
 </div>
 
 <header>
-  <div style="display:flex; align-items:center; justify-content:space-between;">
-    <div>
-      <div class="welcome-msg">{{ saludo }}, {{ userName }}</div>
+  <div class="header-content">
+    <div class="header-left">
       <h1>CENTRAL HUB</h1>
       <div class="date-time">{{ dateTimeString }}</div>
     </div>
-    <div style="display:flex; align-items:center; gap:1rem;">
+
+    <div class="header-center">
+      <div class="profile-chip">
+        <div class="avatar">{{ userInitials }}</div>
+        <div class="profile-details">
+          <span class="profile-name">{{ userName }} {{ userLastName }}</span>
+          <span class="profile-label">Sesión Activa</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
       <button (click)="abrirNotas()" id="btn-notas" title="Notas">📝</button>
       <button (click)="onLogout()" class="logout-btn-comp">Cerrar Sesión</button>
     </div>
