@@ -69,26 +69,29 @@ export class Login implements OnInit {
           this.apellidos
         );
         if (error) {
-          this.errorMessage = error.message;
+          this.errorMessage = this.translateError(error.message);
         } else if (data.user) {
-          // Si el usuario requiere confirmación de email
           if (data.session) {
-            // Autologin directo si confirmación está desactivada
+            // Confirmación de email desactivada: login automático
             this.router.navigate(['/dashboard']);
           } else {
-            this.successMessage = '¡Registro exitoso! Revisa tu correo para confirmar la cuenta o inicia sesión.';
+            // Confirmación de email requerida
+            this.successMessage = '¡Registro exitoso! Revisa tu correo y confirma tu cuenta antes de iniciar sesión.';
             this.isRegisterMode = false;
+            this.email = this.email;
             this.password = '';
           }
+        } else {
+          this.errorMessage = 'No se pudo completar el registro. Intenta nuevamente.';
         }
       } else {
         const { data, error } = await this.supabaseService.signIn(this.email, this.password);
         if (error) {
-          this.errorMessage = error.message === 'Invalid login credentials' 
-            ? 'Email o contraseña incorrectos.' 
-            : error.message;
+          this.errorMessage = this.translateError(error.message);
         } else if (data.user) {
           this.router.navigate(['/dashboard']);
+        } else {
+          this.errorMessage = 'No se pudo iniciar sesión. Intenta nuevamente.';
         }
       }
     } catch (err: any) {
@@ -97,5 +100,26 @@ export class Login implements OnInit {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  private translateError(msg: string): string {
+    const errors: { [key: string]: string } = {
+      'Invalid login credentials': 'Email o contraseña incorrectos.',
+      'Email not confirmed': 'Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.',
+      'User already registered': 'Este correo ya tiene una cuenta registrada. Inicia sesión.',
+      'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres.',
+      'Unable to validate email address: invalid format': 'El formato del correo es inválido.',
+      'Signup is disabled': 'El registro de nuevos usuarios está deshabilitado.',
+      'Email rate limit exceeded': 'Demasiados intentos. Espera unos minutos antes de intentar nuevamente.',
+      'Invalid email or password': 'Email o contraseña incorrectos.'
+    };
+
+    for (const key of Object.keys(errors)) {
+      if (msg.toLowerCase().includes(key.toLowerCase())) {
+        return errors[key];
+      }
+    }
+
+    return msg || 'Ocurrió un error inesperado.';
   }
 }
