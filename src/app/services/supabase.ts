@@ -13,6 +13,19 @@ export class SupabaseService {
   }
 
   // --- AUTH METHODS ---
+  async signUp(email: string, password: string, nombres: string, apellidos: string) {
+    return await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          nombres,
+          apellidos
+        }
+      }
+    });
+  }
+
   async signIn(email: string, password: string) {
     return await this.supabase.auth.signInWithPassword({ email, password });
   }

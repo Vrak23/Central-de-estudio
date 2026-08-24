@@ -14,7 +14,11 @@ import { SupabaseService } from '../services/supabase';
 export class Login implements OnInit {
   email = '';
   password = '';
+  nombres = '';
+  apellidos = '';
+  isRegisterMode = false;
   errorMessage = '';
+  successMessage = '';
   isLoading = false;
 
   constructor(
@@ -29,23 +33,63 @@ export class Login implements OnInit {
     }
   }
 
+  toggleMode() {
+    this.isRegisterMode = !this.isRegisterMode;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.email = '';
+    this.password = '';
+    this.nombres = '';
+    this.apellidos = '';
+  }
+
   async onSubmit() {
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Por favor, complete todos los campos.';
-      return;
+    if (this.isRegisterMode) {
+      if (!this.email || !this.password || !this.nombres) {
+        this.errorMessage = 'Por favor, complete todos los campos obligatorios.';
+        return;
+      }
+    } else {
+      if (!this.email || !this.password) {
+        this.errorMessage = 'Por favor, complete todos los campos.';
+        return;
+      }
     }
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     try {
-      const { data, error } = await this.supabaseService.signIn(this.email, this.password);
-      if (error) {
-        this.errorMessage = error.message === 'Invalid login credentials' 
-          ? 'Email o contraseña incorrectos.' 
-          : error.message;
-      } else if (data.user) {
-        this.router.navigate(['/dashboard']);
+      if (this.isRegisterMode) {
+        const { data, error } = await this.supabaseService.signUp(
+          this.email,
+          this.password,
+          this.nombres,
+          this.apellidos
+        );
+        if (error) {
+          this.errorMessage = error.message;
+        } else if (data.user) {
+          // Si el usuario requiere confirmación de email
+          if (data.session) {
+            // Autologin directo si confirmación está desactivada
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.successMessage = '¡Registro exitoso! Revisa tu correo para confirmar la cuenta o inicia sesión.';
+            this.isRegisterMode = false;
+            this.password = '';
+          }
+        }
+      } else {
+        const { data, error } = await this.supabaseService.signIn(this.email, this.password);
+        if (error) {
+          this.errorMessage = error.message === 'Invalid login credentials' 
+            ? 'Email o contraseña incorrectos.' 
+            : error.message;
+        } else if (data.user) {
+          this.router.navigate(['/dashboard']);
+        }
       }
     } catch (err: any) {
       console.error(err);

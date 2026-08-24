@@ -86,6 +86,34 @@
   text-align: center;
 }
 
+.alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid #10b981;
+  color: #34d399;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.toggle-mode-container {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.toggle-mode-link {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.toggle-mode-link:hover {
+  color: var(--accent-color);
+}
+
+
 .btn-primary {
   position: relative;
   display: inline-flex;
