@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -11,7 +11,7 @@ import { SupabaseService } from '../services/supabase';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, OnDestroy {
   userName = 'Usuario';
   userLastName = '';
   userInitials = 'U';
@@ -42,15 +42,20 @@ export class Dashboard implements OnInit {
 
   formError = '';
   notaError = '';
+  private clockInterval?: ReturnType<typeof setInterval>;
 
   constructor(
     private supabaseService: SupabaseService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
     this.updateDateTime();
-    setInterval(() => this.updateDateTime(), 60000); // Actualizar cada minuto
+    this.clockInterval = setInterval(() => {
+      this.updateDateTime();
+      this.refreshView();
+    }, 60000); // Actualizar cada minuto
 
     const user = await this.supabaseService.getUser();
     if (user) {
@@ -76,10 +81,18 @@ export class Dashboard implements OnInit {
       const firstChar = name ? name.trim().charAt(0) : 'U';
       const secondChar = lastName ? lastName.trim().charAt(0) : '';
       this.userInitials = (firstChar + secondChar).toUpperCase();
+      this.refreshView();
     }
 
     await this.loadSitios();
     await this.loadNotas();
+    this.refreshView();
+  }
+
+  ngOnDestroy() {
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+    }
   }
 
   updateDateTime() {
@@ -113,11 +126,13 @@ export class Dashboard implements OnInit {
 
   async loadSitios() {
     this.sitios = await this.supabaseService.getSitios();
+    this.refreshView();
   }
 
   async loadNotas() {
     this.notas = await this.supabaseService.getNotas();
     this.groupNotes();
+    this.refreshView();
   }
 
   groupNotes() {
@@ -197,9 +212,11 @@ export class Dashboard implements OnInit {
       await this.supabaseService.addSitio(nombre, url, iconoFinal, categoria);
       await this.loadSitios();
       this.cerrarModal();
+      this.refreshView();
     } catch (err: any) {
       console.error(err);
       this.formError = err.message || 'Error al guardar el sitio.';
+      this.refreshView();
     }
   }
 
@@ -212,6 +229,7 @@ export class Dashboard implements OnInit {
     } catch (err) {
       console.error('Error al eliminar sitio:', err);
       alert('No se pudo eliminar el sitio.');
+      this.refreshView();
     }
   }
 
@@ -248,6 +266,7 @@ export class Dashboard implements OnInit {
     } catch (err: any) {
       console.error(err);
       this.notaError = err.message || 'Error al agregar la nota.';
+      this.refreshView();
     }
   }
 
@@ -261,6 +280,7 @@ export class Dashboard implements OnInit {
       await this.loadNotas();
     } catch (err) {
       console.error('Error al editar nota:', err);
+      this.refreshView();
     }
   }
 
@@ -272,6 +292,7 @@ export class Dashboard implements OnInit {
       await this.loadNotas();
     } catch (err) {
       console.error('Error al eliminar nota:', err);
+      this.refreshView();
     }
   }
 
@@ -293,5 +314,9 @@ export class Dashboard implements OnInit {
   async onLogout() {
     await this.supabaseService.signOut();
     this.router.navigate(['/login']);
+  }
+
+  private refreshView() {
+    this.cdr.detectChanges();
   }
 }
