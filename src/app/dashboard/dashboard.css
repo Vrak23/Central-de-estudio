@@ -24,28 +24,30 @@
 }
 
 .profile-chip {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(8px);
+  background: rgba(22, 22, 28, 0.62);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   padding: 8px 16px;
   border-radius: 50px;
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-deep);
   transition: all 0.3s ease;
 }
 
 .profile-chip:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(249, 115, 22, 0.4);
   transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 26px var(--accent-glow);
 }
 
 .avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--accent-color), #2563eb);
+  background: linear-gradient(135deg, var(--accent), #ea580c);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -54,7 +56,7 @@
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.5px;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
 }
 
 .profile-details {
@@ -71,7 +73,7 @@
 
 .profile-label {
   font-size: 0.7rem;
-  color: #10b981; /* Green color for "Active" */
+  color: var(--success); 
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -100,24 +102,24 @@
   }
 }
 
-/* src/app/dashboard/dashboard.css */
-
+/* CARDS */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* Centrado total dentro de las tarjetas */
 .card {
-  background: var(--card-bg);
-  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(29, 29, 36, 0.78), rgba(17, 17, 22, 0.66));
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius-panel);
   padding: 1.5rem;
-  border: 1px solid #2d3748;
-  transition: transform 0.2s, border-color 0.2s;
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
   color: inherit;
   display: flex;
@@ -127,11 +129,14 @@
   min-height: 250px;   
   justify-content: space-between;
   box-sizing: border-box;
+  box-shadow: var(--shadow-deep);
+  overflow: hidden;
 }
 
 .card:hover {
   transform: translateY(-5px);
-  border-color: var(--accent-color);
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5), 0 0 28px var(--accent-glow);
 }
 
 .card-type { 
@@ -145,14 +150,27 @@
   font-size: 1.2rem; 
   font-weight: 600; 
   margin: 0.5rem 0; 
-  color: var(--accent-color); 
+  color: var(--text-main); 
+}
+
+.card:hover .card-title,
+.selection-card:hover h3 {
+  color: var(--accent);
+}
+
+.card p,
+.selection-card p {
+  color: var(--text-dim);
+  line-height: 1.5;
 }
 
 .db-badge {
   display: inline-block;
-  background: #1e293b;
-  padding: 2px 8px;
-  border-radius: 4px;
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(249, 115, 22, 0.22);
+  padding: 4px 10px;
+  border-radius: 999px;
   font-size: 0.75rem;
   margin-top: 10px;
 }
@@ -162,7 +180,7 @@
   border: 1px solid #ef4444;
   color: #ef4444;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -171,12 +189,6 @@
 .logout-btn-comp:hover {
   background: rgba(239, 68, 68, 0.1);
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
-}
-
-/* Efecto visual de "Selección" en las tarjetas */
-.card:active {
-  transform: scale(0.98);
-  background: #23272e;
 }
 
 .grid-selection {
@@ -195,19 +207,22 @@
 }
 
 .selection-card {
-  background: var(--card-bg);
+  background: linear-gradient(145deg, rgba(29, 29, 36, 0.78), rgba(17, 17, 22, 0.66));
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   padding: 3rem 2rem;
-  border-radius: 20px;
+  border-radius: var(--radius-panel);
   text-align: center;
-  border: 2px solid #2d3748;
+  border: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: var(--shadow-deep);
 }
 
 .selection-card:hover {
-  border-color: var(--accent-color);
-  background: #1e2229;
+  border-color: rgba(249, 115, 22, 0.4);
   transform: translateY(-10px);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.52), 0 0 32px var(--accent-glow);
 }
 
 .selection-card .icon { 
@@ -239,10 +254,10 @@
 /* Estilo para el botón de regreso */
 .back-btn {
   background: transparent;
-  border: 1px solid var(--accent-color);
-  color: var(--accent-color);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: var(--accent);
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -252,26 +267,27 @@
 }
 
 .back-btn:hover {
-  background: var(--accent-color);
+  background: rgba(249, 115, 22, 0.14);
   color: white;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 22px rgba(249, 115, 22, 0.18);
   transform: translateX(-5px);
 }
 
 /* BOTÓN AGREGAR SITIO */
 .add-btn {
-  background: var(--accent-color);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: white;
   border: none;
   padding: 10px 18px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 .add-btn:hover { 
-  background: #2563eb; 
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(249, 115, 22, 0.28);
 }
 
 /* DYNAMIC ICONS */
@@ -288,7 +304,7 @@
   max-width: 64px;
   max-height: 64px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
 }
 .dyn-icon-emoji {
   font-size: 2.5rem;
@@ -321,11 +337,11 @@
   right: 10px;
   background: transparent;
   border: none;
-  color: #4a5568;
+  color: var(--text-muted);
   font-size: 0.85rem;
   cursor: pointer;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: 8px;
   transition: color 0.2s, background 0.2s;
   z-index: 2;
 }
@@ -338,8 +354,9 @@
 #modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -348,9 +365,11 @@
 }
 
 #modal-box {
-  background: var(--card-bg);
-  border: 1px solid #2d3748;
-  border-radius: 16px;
+  background: var(--bg-surface-strong);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
   padding: 2rem;
   width: 100%;
   max-width: 420px;
@@ -362,7 +381,7 @@
   margin: 0 0 1.5rem 0;
   font-size: 1.1rem;
   color: var(--text-main);
-  border-left: 4px solid var(--accent-color);
+  border-left: 4px solid var(--accent);
   padding-left: 10px;
 }
 
@@ -381,19 +400,21 @@
 .modal-field select {
   width: 100%;
   box-sizing: border-box;
-  background: #0f1115;
-  border: 1px solid #2d3748;
+  background: var(--bg-field);
+  border: 1px solid var(--border);
   color: var(--text-main);
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .modal-field input:focus,
 .modal-field select:focus {
-  border-color: var(--accent-color);
+  border-color: rgba(249, 115, 22, 0.65);
+  background: rgba(15, 15, 18, 0.95);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .modal-actions {
@@ -403,56 +424,59 @@
 }
 
 .btn-guardar {
-  background: var(--accent-color);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: white;
   border: none;
   padding: 10px 24px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: background 0.2s, opacity 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 .btn-guardar:hover:not(:disabled) { 
-  background: #2563eb; 
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(249, 115, 22, 0.26);
 }
 
 .btn-cancelar {
   background: transparent;
   color: var(--text-dim);
-  border: 1px solid #2d3748;
+  border: 1px solid var(--border);
   padding: 10px 24px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   cursor: pointer;
   font-size: 0.95rem;
   transition: color 0.2s, border-color 0.2s;
 }
 .btn-cancelar:hover { 
   color: var(--text-main); 
-  border-color: #4a5568; 
+  border-color: var(--border-strong); 
 }
 
 /* ===== PANEL DE NOTAS ===== */
 #btn-notas {
   background: transparent;
-  border: 1px solid #2d3748;
+  border: 1px solid var(--border);
   color: var(--text-main);
   font-size: 1.2rem;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-input);
   cursor: pointer;
   transition: all 0.2s;
 }
 #btn-notas:hover {
-  border-color: var(--accent-color);
-  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(249, 115, 22, 0.45);
+  background: rgba(249, 115, 22, 0.12);
+  box-shadow: 0 8px 22px rgba(249, 115, 22, 0.14);
 }
 
 #notas-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(2px);
+  background: rgba(0,0,0,0.48);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   z-index: 900;
 }
 
@@ -462,13 +486,16 @@
   right: -420px;
   width: 400px;
   height: 100vh;
-  background: var(--card-bg);
-  border-left: 1px solid #2d3748;
+  background: rgba(18, 18, 23, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-left: 1px solid var(--border);
   z-index: 901;
   display: flex;
   flex-direction: column;
   transition: right 0.3s ease;
   overflow: hidden;
+  box-shadow: -18px 0 42px rgba(0, 0, 0, 0.42);
 }
 #notas-panel.abierto { 
   right: 0; 
@@ -479,7 +506,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid #2d3748;
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
   font-size: 1rem;
 }
@@ -491,7 +518,7 @@
   font-size: 1rem;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 8px;
   transition: color 0.2s;
 }
 #notas-close:hover { 
@@ -500,7 +527,7 @@
 
 #notas-form {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #2d3748;
+  border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -508,50 +535,53 @@
 
 #notas-form input,
 #notas-form textarea {
-  background: #0f1115;
-  border: 1px solid #2d3748;
+  background: var(--bg-field);
+  border: 1px solid var(--border);
   color: var(--text-main);
   padding: 8px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-input);
   font-size: 0.85rem;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   resize: vertical;
 }
 #notas-form input:focus,
 #notas-form textarea:focus { 
-  border-color: var(--accent-color); 
+  border-color: rgba(249, 115, 22, 0.65); 
+  background: rgba(15, 15, 18, 0.95);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .nota-btn-guardar {
-  background: var(--accent-color);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: white;
   border: none;
   padding: 7px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-input);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
   transition: background 0.2s;
 }
 .nota-btn-guardar:hover { 
-  background: #2563eb; 
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.24);
+  transform: translateY(-1px);
 }
 
 .nota-btn-limpiar {
   background: transparent;
   color: var(--text-dim);
-  border: 1px solid #2d3748;
+  border: 1px solid var(--border);
   padding: 7px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-input);
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
 .nota-btn-limpiar:hover { 
   color: var(--text-main); 
-  border-color: #4a5568; 
+  border-color: var(--border-strong); 
 }
 
 #notas-lista {
@@ -560,22 +590,42 @@
   padding: 1rem 1.5rem;
 }
 
+#notas-lista::-webkit-scrollbar {
+  width: 10px;
+}
+
+#notas-lista::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+#notas-lista::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.45);
+  border: 2px solid rgba(18, 18, 23, 0.95);
+  border-radius: 999px;
+}
+
 .nota-categoria-titulo {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--accent-color);
+  color: var(--accent);
   margin: 1rem 0 0.5rem 0;
   font-weight: 600;
 }
 
 .nota-item {
-  background: #0f1115;
-  border: 1px solid #2d3748;
-  border-radius: 8px;
+  background: rgba(15, 15, 18, 0.72);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
   padding: 0.75rem;
   margin-bottom: 0.5rem;
   position: relative;
+}
+
+.nota-item:hover,
+.nota-item:focus-within {
+  border-color: rgba(249, 115, 22, 0.38);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28), 0 0 18px rgba(249, 115, 22, 0.1);
 }
 
 .nota-item-titulo {
@@ -597,12 +647,12 @@
 
 .nota-item-contenido:focus {
   color: var(--text-main);
-  border-bottom: 1px dashed var(--accent-color);
+  border-bottom: 1px dashed var(--accent);
 }
 
 .nota-item-fecha {
   font-size: 0.72rem;
-  color: #4a5568;
+  color: var(--text-muted);
   margin-top: 0.4rem;
 }
 
@@ -612,11 +662,11 @@
   right: 8px;
   background: transparent;
   border: none;
-  color: #4a5568;
+  color: var(--text-muted);
   font-size: 0.8rem;
   cursor: pointer;
   padding: 2px 5px;
-  border-radius: 3px;
+  border-radius: 8px;
   transition: color 0.2s;
 }
 .nota-eliminar:hover { 
