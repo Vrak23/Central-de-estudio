@@ -168,4 +168,36 @@ export class SupabaseService {
 
     if (error) throw error;
   }
+
+  // --- SENATI TAREAS SUMMARY ---
+  async getTareasSenatiPendientes() {
+    const user = await this.getUser();
+    if (!user) return [];
+
+    const { data, error } = await this.supabase
+      .from('senati_tareas')
+      .select('*, curso:senati_cursos(*)')
+      .eq('usuario_id', user.id)
+      .neq('estado', 'entregado')
+      .order('fecha_limite', { ascending: true })
+      .limit(3);
+
+    if (error) {
+      console.warn('No se pudieron obtener tareas de senati:', error.message);
+      return [];
+    }
+    return data || [];
+  }
+
+  async updateTareaSenatiEstado(tareaId: string, estado: 'pendiente' | 'en_progreso' | 'entregado') {
+    const { data, error } = await this.supabase
+      .from('senati_tareas')
+      .update({ estado, updated_at: new Date().toISOString() })
+      .eq('id', tareaId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
 }
