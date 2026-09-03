@@ -77,7 +77,7 @@ export class SupabaseService {
     return data || [];
   }
 
-  async addSitio(nombre: string, url: string, icono: string, categoria: 'personal' | 'fijo') {
+  async addSitio(nombre: string, url: string, icono: string, categoria: 'personal' | 'fijo', descripcion: string = '') {
     const user = await this.getUser();
     if (!user) throw new Error('Usuario no autenticado');
 
@@ -89,7 +89,8 @@ export class SupabaseService {
           nombre,
           url,
           icono: icono || '🌐',
-          categoria
+          categoria,
+          descripcion
         }
       ])
       .select()

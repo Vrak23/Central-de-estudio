@@ -1,7 +1,63 @@
-<!-- PANEL LATERAL DE NOTAS -->
+<!-- ==================================================== -->
+<!-- PANEL DESLIZANTE DE TAREAS SENATI (SLIDE A LA IZQ)   -->
+<!-- ==================================================== -->
+<div 
+  *ngIf="senatiDrawerOpen" 
+  id="senati-overlay" 
+  class="backdrop-fade-in"
+  (click)="cerrarSenatiDrawer()"
+></div>
+
+<div id="senati-drawer" [class.abierto]="senatiDrawerOpen">
+  <div class="drawer-header">
+    <div class="drawer-title-row">
+      <span class="drawer-title">📚 Tareas SENATI</span>
+      <span *ngIf="tareasSenati.length > 0" class="drawer-count-badge">{{ tareasSenati.length }} pendientes</span>
+    </div>
+    <button (click)="cerrarSenatiDrawer()" class="drawer-close-btn" title="Cerrar">✕</button>
+  </div>
+
+  <div class="drawer-content">
+    <div class="drawer-portal-banner">
+      <span>Portal Académico SENATI</span>
+      <a href="https://senati-portal.vercel.app/" target="_blank" class="drawer-portal-link">
+        Abrir portal →
+      </a>
+    </div>
+
+    <!-- Lista de Tareas -->
+    <div class="drawer-tasks-list">
+      <div *ngIf="tareasSenati.length === 0" class="drawer-empty-state">
+        ✨ ¡Estás al día! No tienes tareas pendientes.
+      </div>
+
+      <div *ngFor="let t of tareasSenati" class="drawer-task-card">
+        <button 
+          type="button" 
+          (click)="marcarTareaEntregada(t.id)" 
+          class="senati-check-mini" 
+          title="Marcar completada">
+          ✓
+        </button>
+        <div class="drawer-task-info">
+          <div class="drawer-task-title">{{ t.titulo }}</div>
+          <div class="drawer-task-meta">
+            <span class="drawer-course-tag">{{ t.curso?.nombre || 'General' }}</span>
+            <span class="drawer-date-tag">🕒 {{ formatDateSenati(t.fecha_limite) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- PANEL LATERAL DE NOTAS                               -->
+<!-- ==================================================== -->
 <div 
   *ngIf="notasPanelOpen" 
   id="notas-overlay" 
+  class="backdrop-fade-in"
   (click)="cerrarNotas()"
 ></div>
 
@@ -59,11 +115,13 @@
   </div>
 </div>
 
-<!-- CABECERA SUPERIOR -->
+<!-- ==================================================== -->
+<!-- CABECERA SUPERIOR                                    -->
+<!-- ==================================================== -->
 <header>
   <div class="header-content">
     <div class="header-left">
-      <div class="brand-badge-container">
+      <div class="brand-badge-container" (click)="irADashboard()" style="cursor: pointer;">
         <h1 class="brand-title">CENTRAL HUB</h1>
       </div>
       <div class="date-time">{{ dateTimeString }}</div>
@@ -72,7 +130,7 @@
     <div class="header-right">
       <!-- BUSCADOR RÁPIDO TRIGGER (CTRL+K) -->
       <button (click)="toggleSpotlight()" class="spotlight-trigger-btn" title="Buscar enlaces o comandos (Ctrl + K)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.7;">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.75;">
           <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
         </svg>
         <span class="spotlight-btn-text">Buscar...</span>
@@ -82,7 +140,7 @@
       <!-- BOTÓN APPS DROPDOWN -->
       <details class="hamburger-menu apps-dropdown">
         <summary class="apps-button" title="Ecosistema de Apps">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px; flex-shrink: 0;">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 5px; flex-shrink: 0;">
             <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
           </svg>
           <span>Apps</span>
@@ -139,6 +197,23 @@
             </div>
           </div>
 
+          <!-- BOTÓN TAREAS SENATI EN HAMBURGUESA -->
+          <button (click)="abrirSenatiDrawer()" class="menu-link-btn" title="Ver tareas pendientes de SENATI">
+            <div style="display:flex; align-items:center; gap:0.45rem;">
+              <span>📚</span>
+              <span>Tareas SENATI</span>
+            </div>
+            <span *ngIf="tareasSenati.length > 0" class="menu-badge-count">{{ tareasSenati.length }}</span>
+          </button>
+
+          <!-- BOTÓN CHULETAS DEV EN HAMBURGUESA -->
+          <button (click)="irACheatsheet()" class="menu-link-btn" title="Ver chuletas de servidores">
+            <div style="display:flex; align-items:center; gap:0.45rem;">
+              <span>⚡</span>
+              <span>Chuletas Dev</span>
+            </div>
+          </button>
+
           <button (click)="abrirNotas()" id="btn-notas" title="Notas">📝 Notas Rápidas</button>
           <button (click)="onLogout()" class="logout-btn-comp">Cerrar Sesión</button>
         </div>
@@ -147,118 +222,59 @@
   </div>
 </header>
 
-<div class="container">
-  <!-- BANNER SALUDO & WIDGET INTELIGENTE SENATI -->
-  <section class="command-hero">
-    <div class="greeting-box">
-      <h2 class="hero-title">{{ saludo }}, <span class="highlight-name">{{ userName }}</span></h2>
-      <p class="hero-subtitle">Centro de comando listo. ¿En qué trabajaremos hoy?</p>
-    </div>
-
-    <!-- WIDGET DE TAREAS SENATI PRÓXIMAS -->
-    <div *ngIf="tareasSenati.length > 0" class="senati-summary-card">
-      <div class="senati-card-header">
-        <div class="senati-card-title">
-          <span class="senati-indicator-dot"></span>
-          <span>Tareas Pendientes SENATI</span>
-          <span class="senati-count-chip">{{ tareasSenati.length }}</span>
-        </div>
-        <a href="https://senati-portal.vercel.app/" target="_blank" class="senati-view-all-link">
-          Abrir Portal →
-        </a>
+<div class="container main-container">
+  <!-- ==================================================== -->
+  <!-- VISTA 1: DASHBOARD PRINCIPAL                         -->
+  <!-- ==================================================== -->
+  <main *ngIf="vistaActiva === 'dashboard'" class="dashboard-fade-in">
+    <!-- BANNER SALUDO & BOTÓN CUADRADO DESKTOP TAREAS -->
+    <section class="command-hero">
+      <div class="greeting-box">
+        <h2 class="hero-title">{{ saludo }}, <span class="highlight-name">{{ userName }}</span></h2>
+        <p class="hero-subtitle">Centro de comando listo. ¿En qué trabajaremos hoy?</p>
       </div>
 
-      <div class="senati-tasks-preview-list">
-        <div *ngFor="let t of tareasSenati" class="senati-task-item">
-          <button 
-            type="button" 
-            (click)="marcarTareaEntregada(t.id)" 
-            class="senati-check-circle"
-            title="Marcar completada">
-            ✓
-          </button>
-          <div class="senati-task-info">
-            <div class="senati-task-name">{{ t.titulo }}</div>
-            <div class="senati-task-meta">
-              <span class="senati-course-name">{{ t.curso?.nombre || 'General' }}</span>
-              <span class="senati-time-chip">🕒 {{ formatDateSenati(t.fecha_limite) }}</span>
-            </div>
+      <!-- BOTÓN CUADRADO TRIGGER DESKTOP (SLIDE A LA IZQUIERDA) -->
+      <div class="hero-desktop-trigger-box">
+        <button 
+          type="button" 
+          (click)="abrirSenatiDrawer()" 
+          class="senati-square-btn" 
+          title="Ver tareas de SENATI">
+          <div class="square-btn-icon-row">
+            <span class="square-btn-icon">📚</span>
+            <span *ngIf="tareasSenati.length > 0" class="square-btn-badge">{{ tareasSenati.length }}</span>
           </div>
-          <span class="senati-priority-pill" [class.urgent]="t.prioridad === 'alta'">
-            {{ t.prioridad }}
-          </span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECCIÓN 1: PORTALES & ENLACES ORGANIZADOS POR CARPETAS -->
-  <section class="dashboard-block">
-    <div class="section-header-bar">
-      <!-- Pestañas de Carpetas -->
-      <div class="folder-tabs-scroll">
-        <button 
-          type="button" 
-          class="folder-tab-btn" 
-          [class.active]="activeTabPortales === 'todos'" 
-          (click)="activeTabPortales = 'todos'">
-          🌐 Todos
-        </button>
-        <button 
-          type="button" 
-          class="folder-tab-btn" 
-          [class.active]="activeTabPortales === 'estudio'" 
-          (click)="activeTabPortales = 'estudio'">
-          🎓 Estudio
-        </button>
-        <button 
-          type="button" 
-          class="folder-tab-btn" 
-          [class.active]="activeTabPortales === 'dev'" 
-          (click)="activeTabPortales = 'dev'">
-          💻 Desarrollo
-        </button>
-        <button 
-          type="button" 
-          class="folder-tab-btn" 
-          [class.active]="activeTabPortales === 'herramientas'" 
-          (click)="activeTabPortales = 'herramientas'">
-          🛠️ Herramientas
-        </button>
-        <button 
-          type="button" 
-          class="folder-tab-btn" 
-          [class.active]="activeTabPortales === 'personal'" 
-          (click)="activeTabPortales = 'personal'">
-          📌 Mis Sitios ({{ sitiosPersonales.length }})
+          <div class="square-btn-texts">
+            <span class="square-btn-title">Tareas SENATI</span>
+            <span class="square-btn-sub">{{ tareasSenati.length > 0 ? (tareasSenati[0].titulo) : 'Sin pendientes' }}</span>
+          </div>
+          <span class="square-btn-arrow">→</span>
         </button>
       </div>
+    </section>
 
-      <button (click)="abrirModal()" class="add-btn">+ Agregar sitio</button>
-    </div>
+    <!-- SECCIÓN DE PORTALES & ENLACES -->
+    <section class="dashboard-block">
+      <div class="section-title-row">
+        <h2 class="clean-section-title">Portales & Sitios</h2>
+        <button (click)="abrirModal()" class="add-btn">+ Agregar sitio</button>
+      </div>
 
-    <!-- Grid de Portales Fijos -->
-    <div *ngIf="activeTabPortales !== 'personal'" class="grid">
-      <a *ngFor="let portal of portalesFiltrados" [href]="portal.url" target="_blank" class="card">
-        <div class="card-logo">
-          <img [src]="portal.icono" [alt]="portal.nombre" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'">
-        </div>
-        <div class="card-title">{{ portal.nombre }}</div>
-        <p>{{ portal.descripcion }}</p>
-      </a>
-    </div>
+      <!-- Grid Unificado y Espacioso de Portales -->
+      <div class="grid">
+        <!-- Portales Fijos -->
+        <a *ngFor="let portal of portalesFijos" [href]="portal.url" target="_blank" class="card">
+          <div class="card-logo">
+            <img [src]="portal.icono" [alt]="portal.nombre" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'">
+          </div>
+          <div class="card-info">
+            <div class="card-title">{{ portal.nombre }}</div>
+            <p>{{ portal.descripcion }}</p>
+          </div>
+        </a>
 
-    <!-- Grid de Sitios Personales -->
-    <div *ngIf="activeTabPortales === 'todos' || activeTabPortales === 'personal'" style="margin-top: 1.5rem;">
-      <h3 *ngIf="activeTabPortales === 'todos' && sitiosPersonales.length > 0" class="sub-section-title">
-        📌 Mis Sitios Guardados
-      </h3>
-
-      <div class="grid" id="grid-sitios">
-        <div *ngIf="sitiosPersonales.length === 0 && activeTabPortales === 'personal'" class="empty-sitios-box">
-          Aún no tienes sitios guardados. Haz clic en "+ Agregar sitio" para guardar tus favoritos.
-        </div>
-        
+        <!-- Sitios Personales -->
         <div *ngFor="let sitio of sitiosPersonales" class="card card-custom" [id]="'sitio-' + sitio.id">
           <button class="btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar sitio">✕</button>
           <a [href]="sitio.url" target="_blank" class="card-link">
@@ -268,102 +284,67 @@
                 <span class="dyn-icon-emoji">{{ sitio.icono }}</span>
               </ng-template>
             </div>
-            <div class="card-title">{{ sitio.nombre }}</div>
-            <p class="card-url">{{ sitio.url }}</p>
+            <div class="card-info">
+              <div class="card-title">{{ sitio.nombre }}</div>
+              <p class="card-url">{{ sitio.descripcion || sitio.url }}</p>
+            </div>
           </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- SECCIÓN 2: CHULETA DE SERVIDORES Y COMANDOS DEV -->
-  <section class="dashboard-block" style="margin-top: 2.5rem;">
-    <div class="section-header-bar">
-      <div>
-        <h2 class="block-title">⚡ Chuleta de Comandos & Servidores</h2>
-        <p class="block-subtitle">Comandos rápidos para iniciar servidores y proyectos con 1 clic.</p>
+  <!-- ==================================================== -->
+  <!-- VISTA 2: PÁGINA ESPECÍFICA DE CHULETAS DEV           -->
+  <!-- ==================================================== -->
+  <main *ngIf="vistaActiva === 'chuletas'" class="dashboard-fade-in">
+    <div class="cheatsheet-header-block">
+      <button (click)="irADashboard()" class="back-dashboard-btn">
+        ← Volver al Dashboard
+      </button>
+
+      <div class="cheatsheet-title-box">
+        <h2 class="cheatsheet-page-title">⚡ Chuletas & Comandos de Servidores</h2>
+        <p class="cheatsheet-page-desc">Comandos listos para iniciar servidores y proyectos. Haz clic sobre cualquier comando para copiarlo.</p>
       </div>
 
       <!-- Filtro por Tecnología -->
-      <div class="tech-filter-chips">
+      <div class="tech-filter-pills">
         <button 
-          (click)="filtroTechComandos = 'todos'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'todos'">
-          Todos
-        </button>
-        <button 
-          (click)="filtroTechComandos = 'Angular'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'Angular'">
-          Angular
-        </button>
-        <button 
-          (click)="filtroTechComandos = 'Vite / React'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'Vite / React'">
-          Vite/React
-        </button>
-        <button 
-          (click)="filtroTechComandos = 'Node / Express'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'Node / Express'">
-          Node
-        </button>
-        <button 
-          (click)="filtroTechComandos = 'PHP / XAMPP'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'PHP / XAMPP'">
-          PHP
-        </button>
-        <button 
-          (click)="filtroTechComandos = 'Python / FastAPI'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'Python / FastAPI'">
-          Python
-        </button>
-        <button 
-          (click)="filtroTechComandos = 'Git'" 
-          class="tech-chip-btn" 
-          [class.active]="filtroTechComandos === 'Git'">
-          Git
+          *ngFor="let tech of techsDisponibles"
+          (click)="filtroTechComandos = tech" 
+          class="tech-pill-btn" 
+          [class.active]="filtroTechComandos === tech">
+          {{ tech === 'todos' ? 'Todos (' + comandosDev.length + ')' : tech }}
         </button>
       </div>
     </div>
 
-    <!-- Grid de Comandos -->
-    <div class="commands-grid">
-      <div *ngFor="let cmd of comandosFiltrados" class="command-card">
-        <div class="command-card-top">
-          <div class="command-tech-tag">
-            <span class="cmd-icon">{{ cmd.icono }}</span>
-            <span class="cmd-tech-name">{{ cmd.tech }}</span>
-          </div>
-          <span class="command-name">{{ cmd.nombre }}</span>
+    <!-- Grid Limpio de Comandos (Sin Saturación) -->
+    <div class="commands-clean-grid">
+      <div *ngFor="let cmd of comandosFiltrados" class="command-clean-card" (click)="copiarComando(cmd.comando)" title="Clic para copiar">
+        <div class="command-card-header">
+          <span class="cmd-tech-badge">{{ cmd.icono }} {{ cmd.tech }}</span>
+          <span class="cmd-title-text">{{ cmd.nombre }}</span>
         </div>
 
-        <p class="command-desc">{{ cmd.descripcion }}</p>
-
-        <!-- Bloque de Código con Copia -->
-        <div class="command-code-box" (click)="copiarComando(cmd.comando)" title="Clic para copiar">
-          <code class="cmd-text">{{ cmd.comando }}</code>
-          <button type="button" class="cmd-copy-btn">
-            📋 Copiar
-          </button>
+        <div class="command-snippet-row">
+          <code class="cmd-code-line">{{ cmd.comando }}</code>
+          <button type="button" class="copy-action-icon">📋</button>
         </div>
       </div>
     </div>
-  </section>
+  </main>
 </div>
 
 <!-- ==================================================== -->
 <!-- SPOTLIGHT QUICK SEARCH MODAL (CTRL + K)              -->
 <!-- ==================================================== -->
-<div *ngIf="spotlightOpen" class="spotlight-backdrop" (click)="spotlightOpen = false">
+<div *ngIf="spotlightOpen" class="spotlight-backdrop backdrop-fade-in" (click)="spotlightOpen = false">
   <div class="spotlight-container" (click)="$event.stopPropagation()">
     <!-- Input Bar -->
     <div class="spotlight-search-header">
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" class="spotlight-search-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="spotlight-search-icon">
         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
       </svg>
       <input 
@@ -407,9 +388,11 @@
   </div>
 </div>
 
-<!-- MODAL AGREGAR SITIO -->
-<div *ngIf="modalAddSitioOpen" id="modal-overlay">
-  <div id="modal-box">
+<!-- ==================================================== -->
+<!-- MODAL AGREGAR SITIO                                  -->
+<!-- ==================================================== -->
+<div *ngIf="modalAddSitioOpen" id="modal-overlay" class="backdrop-fade-in" (click)="cerrarModal()">
+  <div id="modal-box" (click)="$event.stopPropagation()">
     <h3>Agregar nuevo sitio</h3>
 
     <div class="modal-field">
@@ -431,8 +414,12 @@
       <label for="input-url">URL</label>
       <input type="text" id="input-url" [(ngModel)]="newSitio.url" placeholder="Ej: https://moodle.senati.edu.pe" />
     </div>
+    <div class="modal-field">
+      <label for="input-descripcion">Descripción (opcional)</label>
+      <input type="text" id="input-descripcion" [(ngModel)]="newSitio.descripcion" placeholder="Ej: Material de estudio y clases" />
+    </div>
 
-    <p *ngIf="formError" id="form-error" style="color:#ef4444; font-size:0.85rem; margin-top:0.5rem;">
+    <p *ngIf="formError" id="form-error" style="color:#ef4444; font-size:0.8rem; margin-top:0.4rem;">
       {{ formError }}
     </p>
 

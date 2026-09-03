@@ -1,0 +1,7 @@
+Carpeta de Imágenes y Logos de Central Hub
+=============================================
+Puedes colocar aquí cualquier logo o imagen que descargues (por ejemplo: blackboard.png, moodle.svg, senati.png, etc.).
+
+Para utilizarlas en la aplicación o al agregar un nuevo sitio:
+- Escribe la ruta: /img/nombre_de_archivo.png (o .svg / .jpg)
+- Por ejemplo: /img/blackboard.png

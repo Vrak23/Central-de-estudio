@@ -8,7 +8,7 @@ export interface DevComando {
   tech: string;
   nombre: string;
   comando: string;
-  descripcion: string;
+  descripcion?: string;
   icono: string;
 }
 
@@ -18,7 +18,6 @@ export interface PortalFijo {
   url: string;
   icono: string;
   descripcion: string;
-  categoria: 'estudio' | 'dev' | 'herramientas';
 }
 
 @Component({
@@ -35,128 +34,122 @@ export class Dashboard implements OnInit, OnDestroy {
   dateTimeString = '';
   saludo = 'Hola';
 
+  // Vista actual: 'dashboard' o 'chuletas'
+  vistaActiva: 'dashboard' | 'chuletas' = 'dashboard';
+
   // Portales y Sitios
   sitios: any[] = [];
-  activeTabPortales: 'todos' | 'estudio' | 'dev' | 'herramientas' | 'personal' = 'todos';
   
-  // Portales Fijos Base Organizados por Categorías
+  // Portales Fijos con Logos Oficiales Locales
   portalesFijos: PortalFijo[] = [
     {
       id: 'bb',
       nombre: 'Blackboard SENATI',
       url: 'https://senati.blackboard.com/',
-      icono: 'https://cdn-icons-png.flaticon.com/512/2201/2201550.png',
-      descripcion: 'Entregables y clases de SENATI.',
-      categoria: 'estudio'
+      icono: '/img/blackboard.svg',
+      descripcion: 'Entregables y clases de SENATI.'
     },
     {
       id: 'outlook',
       nombre: 'Outlook SENATI',
       url: 'https://outlook.cloud.microsoft/mail/',
-      icono: 'https://cdn-icons-png.flaticon.com/512/732/732200.png',
-      descripcion: 'Correo institucional de SENATI.',
-      categoria: 'estudio'
+      icono: '/img/outlook.svg',
+      descripcion: 'Correo institucional de SENATI.'
     },
     {
       id: 'drive',
       nombre: 'Google Drive',
       url: 'https://drive.google.com',
-      icono: 'https://cdn-icons-png.flaticon.com/512/2965/2965327.png',
-      descripcion: 'Documentación y archivos en la nube.',
-      categoria: 'estudio'
+      icono: '/img/drive.svg',
+      descripcion: 'Documentación y archivos en la nube.'
     },
     {
       id: 'github',
       nombre: 'GitHub',
       url: 'https://github.com',
-      icono: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
-      descripcion: 'Repositorios y control de versiones.',
-      categoria: 'dev'
+      icono: '/img/github.svg',
+      descripcion: 'Repositorios y control de versiones.'
     },
     {
       id: 'vercel',
       nombre: 'Vercel Dashboard',
       url: 'https://vercel.com/dashboard',
-      icono: 'https://cdn-icons-png.flaticon.com/512/5968/5968705.png',
-      descripcion: 'Despliegues y proyectos en producción.',
-      categoria: 'dev'
+      icono: '/img/vercel.svg',
+      descripcion: 'Despliegues y proyectos en producción.'
     },
     {
       id: 'supabase',
       nombre: 'Supabase Cloud',
       url: 'https://supabase.com/dashboard',
-      icono: 'https://cdn-icons-png.flaticon.com/512/5968/5968382.png',
-      descripcion: 'Base de datos PostgreSQL y Auth.',
-      categoria: 'dev'
+      icono: '/img/supabase.svg',
+      descripcion: 'Base de datos PostgreSQL y Auth.'
     },
     {
       id: 'chatgpt',
       nombre: 'ChatGPT',
       url: 'https://chatgpt.com',
-      icono: 'https://cdn-icons-png.flaticon.com/512/12222/12222588.png',
-      descripcion: 'Asistente de IA y resolución de dudas.',
-      categoria: 'herramientas'
+      icono: '/img/chatgpt.svg',
+      descripcion: 'Asistente de IA y resolución de dudas.'
     },
     {
       id: 'notion',
       nombre: 'Notion',
       url: 'https://notion.so',
-      icono: 'https://cdn-icons-png.flaticon.com/512/5968/5968517.png',
-      descripcion: 'Apuntes, gestión y documentación.',
-      categoria: 'herramientas'
+      icono: '/img/notion.svg',
+      descripcion: 'Apuntes, gestión y documentación.'
     }
   ];
 
-  // Chuleta de Comandos de Servidores y Tecnologías
+  // Catálogo Completo de Chuletas Dev
   comandosDev: DevComando[] = [
-    {
-      tech: 'Angular',
-      nombre: 'Iniciar Servidor Angular',
-      comando: 'ng serve --port 4200',
-      descripcion: 'Levanta servidor de desarrollo en puerto 4200.',
-      icono: '🅰️'
-    },
-    {
-      tech: 'Vite / React',
-      nombre: 'Iniciar Vite / React',
-      comando: 'npm run dev',
-      descripcion: 'Inicia servidor ultra rápido de Vite.',
-      icono: '⚡'
-    },
-    {
-      tech: 'Node / Express',
-      nombre: 'Iniciar Servidor Node',
-      comando: 'npx nodemon index.js',
-      descripcion: 'Ejecuta servidor Node con reinicio automático.',
-      icono: '🟢'
-    },
-    {
-      tech: 'PHP / XAMPP',
-      nombre: 'Servidor PHP Integrado',
-      comando: 'php -S localhost:8000',
-      descripcion: 'Levanta servidor web local rápido de PHP.',
-      icono: '🐘'
-    },
-    {
-      tech: 'Python / FastAPI',
-      nombre: 'Servidor Uvicorn / FastAPI',
-      comando: 'uvicorn main:app --reload',
-      descripcion: 'Inicia API FastAPI con recarga en caliente.',
-      icono: '🐍'
-    },
-    {
-      tech: 'Git',
-      nombre: 'Sincronizar y Subir a Git',
-      comando: 'git add . && git commit -m "update" && git push',
-      descripcion: 'Agrega cambios, crea commit y empuja al remoto.',
-      icono: '🐙'
-    }
+    // Angular
+    { tech: 'Angular', nombre: 'Iniciar Servidor Local', comando: 'ng serve --port 4200', icono: '🅰️' },
+    { tech: 'Angular', nombre: 'Iniciar con Apertura Automática', comando: 'ng serve -o', icono: '🅰️' },
+    { tech: 'Angular', nombre: 'Compilar Producción', comando: 'ng build', icono: '🅰️' },
+    { tech: 'Angular', nombre: 'Generar Componente', comando: 'ng g c nombre-componente', icono: '🅰️' },
+    { tech: 'Angular', nombre: 'Generar Servicio', comando: 'ng g s services/nombre', icono: '🅰️' },
+    
+    // React / Vite / Next.js
+    { tech: 'React / Vite', nombre: 'Iniciar Servidor de Desarrollo', comando: 'npm run dev', icono: '⚡' },
+    { tech: 'React / Vite', nombre: 'Crear Proyecto Vite', comando: 'npm create vite@latest mi-app -- --template react-ts', icono: '⚡' },
+    { tech: 'React / Vite', nombre: 'Compilar Bundle', comando: 'npm run build', icono: '⚡' },
+    { tech: 'Next.js', nombre: 'Iniciar Servidor Next.js', comando: 'npx next dev', icono: '▲' },
+    
+    // Node / Backend
+    { tech: 'Node.js', nombre: 'Ejecutar con Reinicio Automático', comando: 'npx nodemon index.js', icono: '🟢' },
+    { tech: 'Node.js', nombre: 'Ejecutar con Node Nativo', comando: 'node --watch server.js', icono: '🟢' },
+    { tech: 'Node.js', nombre: 'Instalar Dependencias', comando: 'npm install', icono: '🟢' },
+    
+    // PHP / XAMPP / Laravel
+    { tech: 'PHP / XAMPP', nombre: 'Servidor PHP Integrado', comando: 'php -S localhost:8000', icono: '🐘' },
+    { tech: 'PHP / XAMPP', nombre: 'Servidor PHP con Carpeta Pública', comando: 'php -S localhost:8000 -t public', icono: '🐘' },
+    { tech: 'Laravel', nombre: 'Iniciar Servidor Artisan', comando: 'php artisan serve', icono: '🔴' },
+    { tech: 'Laravel', nombre: 'Ejecutar Migraciones', comando: 'php artisan migrate', icono: '🔴' },
+    
+    // Python / FastAPI / Django
+    { tech: 'Python', nombre: 'Servidor Uvicorn / FastAPI', comando: 'uvicorn main:app --reload --port 8000', icono: '🐍' },
+    { tech: 'Python', nombre: 'Crear Entorno Virtual', comando: 'python -m venv venv', icono: '🐍' },
+    { tech: 'Python', nombre: 'Activar Entorno (Windows)', comando: '.\\venv\\Scripts\\activate', icono: '🐍' },
+    { tech: 'Python', nombre: 'Instalar Requerimientos', comando: 'pip install -r requirements.txt', icono: '🐍' },
+    { tech: 'Django', nombre: 'Iniciar Servidor Django', comando: 'python manage.py runserver', icono: '🟩' },
+    
+    // Git
+    { tech: 'Git', nombre: 'Sincronizar y Subir Cambios', comando: 'git add . && git commit -m "update" && git push', icono: '🐙' },
+    { tech: 'Git', nombre: 'Ver Estado de Archivos', comando: 'git status', icono: '🐙' },
+    { tech: 'Git', nombre: 'Actualizar desde Remoto', comando: 'git pull origin main', icono: '🐙' },
+    { tech: 'Git', nombre: 'Deshacer Último Commit Local', comando: 'git reset --soft HEAD~1', icono: '🐙' },
+    
+    // Docker
+    { tech: 'Docker', nombre: 'Levantar Contenedores en Fondo', comando: 'docker compose up -d', icono: '🐳' },
+    { tech: 'Docker', nombre: 'Detener Contenedores', comando: 'docker compose down', icono: '🐳' },
+    { tech: 'Docker', nombre: 'Ver Contenedores Activos', comando: 'docker ps', icono: '🐳' }
   ];
 
   filtroTechComandos = 'todos';
 
   // Resumen de Tareas SENATI
   tareasSenati: any[] = [];
+  senatiDrawerOpen = false;
   loadingTareasSenati = false;
 
   // Buscador Rápido Global (Spotlight)
@@ -173,6 +166,7 @@ export class Dashboard implements OnInit, OnDestroy {
     nombre: '',
     url: '',
     icono: '',
+    descripcion: '',
     categoria: 'personal' as 'personal' | 'fijo'
   };
 
@@ -199,7 +193,6 @@ export class Dashboard implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  // Listener para atajo global Ctrl+K / Cmd+K y Escape
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -216,7 +209,45 @@ export class Dashboard implements OnInit, OnDestroy {
       if (this.notasPanelOpen) {
         this.cerrarNotas();
       }
+      if (this.senatiDrawerOpen) {
+        this.cerrarSenatiDrawer();
+      }
     }
+  }
+
+  // Listener global para cerrar cualquier dropdown o modal al dar clic fuera
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+
+    // 1. Cerrar menús details (Apps y Hamburguesa) si el clic es fuera de ellos
+    const openDetails = document.querySelectorAll('details.hamburger-menu[open]');
+    openDetails.forEach(details => {
+      if (!details.contains(target)) {
+        details.removeAttribute('open');
+      }
+    });
+
+    // 2. Cerrar modal de agregar sitio si se hace clic en el fondo exterior
+    if (this.modalAddSitioOpen && target && target.id === 'modal-overlay') {
+      this.cerrarModal();
+    }
+  }
+
+  abrirSenatiDrawer() {
+    this.cerrarDropdowns();
+    this.senatiDrawerOpen = true;
+    this.refreshView();
+  }
+
+  cerrarSenatiDrawer() {
+    this.senatiDrawerOpen = false;
+    this.refreshView();
+  }
+
+  cerrarDropdowns() {
+    const openDetails = document.querySelectorAll('details.hamburger-menu[open]');
+    openDetails.forEach(details => details.removeAttribute('open'));
   }
 
   async ngOnInit() {
@@ -292,6 +323,19 @@ export class Dashboard implements OnInit, OnDestroy {
     this.dateTimeString = now.toLocaleDateString('es-ES', options);
   }
 
+  // --- NAVEGACIÓN DE VISTAS ---
+  irACheatsheet() {
+    this.cerrarDropdowns();
+    this.vistaActiva = 'chuletas';
+    this.refreshView();
+  }
+
+  irADashboard() {
+    this.cerrarDropdowns();
+    this.vistaActiva = 'dashboard';
+    this.refreshView();
+  }
+
   // --- SENATI TAREAS SUMMARY ---
   async loadTareasSenati() {
     this.loadingTareasSenati = true;
@@ -351,9 +395,20 @@ export class Dashboard implements OnInit, OnDestroy {
       });
     }
 
+    // Chuletas
+    if ('chuletas comandos servidores dev terminal'.includes(q)) {
+      results.push({
+        type: 'Sección',
+        title: 'Chuletas & Comandos Dev',
+        subtitle: 'Ver catálogo de comandos de servidores',
+        icon: '⚡',
+        action: () => this.irACheatsheet()
+      });
+    }
+
     // Portales Fijos
     this.portalesFijos.forEach(p => {
-      if (p.nombre.toLowerCase().includes(q) || p.descripcion.toLowerCase().includes(q) || p.categoria.includes(q)) {
+      if (p.nombre.toLowerCase().includes(q) || p.descripcion.toLowerCase().includes(q)) {
         results.push({
           type: 'Portal',
           title: p.nombre,
@@ -377,7 +432,7 @@ export class Dashboard implements OnInit, OnDestroy {
       }
     });
 
-    // Comandos
+    // Comandos Dev
     this.comandosDev.forEach(c => {
       if (c.nombre.toLowerCase().includes(q) || c.tech.toLowerCase().includes(q) || c.comando.toLowerCase().includes(q)) {
         results.push({
@@ -394,6 +449,11 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   // --- CHEAT SHEET COMANDOS ---
+  get techsDisponibles(): string[] {
+    const list = Array.from(new Set(this.comandosDev.map(c => c.tech)));
+    return ['todos', ...list];
+  }
+
   get comandosFiltrados() {
     if (this.filtroTechComandos === 'todos') {
       return this.comandosDev;
@@ -404,7 +464,7 @@ export class Dashboard implements OnInit, OnDestroy {
   async copiarComando(comando: string) {
     try {
       await navigator.clipboard.writeText(comando);
-      this.showToast('¡Comando copiado al portapapeles! 📋');
+      this.showToast('¡Comando copiado! 📋');
     } catch (err) {
       console.error('Error al copiar:', err);
     }
@@ -422,23 +482,13 @@ export class Dashboard implements OnInit, OnDestroy {
     this.toastTimeout = setTimeout(() => {
       this.toast.show = false;
       this.refreshView();
-    }, 2800);
+    }, 2500);
   }
 
   // --- PORTALES & SITIOS ---
   async loadSitios() {
     this.sitios = await this.supabaseService.getSitios();
     this.refreshView();
-  }
-
-  get portalesFiltrados(): PortalFijo[] {
-    if (this.activeTabPortales === 'todos') {
-      return this.portalesFijos;
-    }
-    if (this.activeTabPortales === 'personal') {
-      return [];
-    }
-    return this.portalesFijos.filter(p => p.categoria === this.activeTabPortales);
   }
 
   get sitiosPersonales() {
@@ -456,7 +506,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.modalAddSitioOpen = false;
-    this.newSitio = { nombre: '', url: '', icono: '', categoria: 'personal' };
+    this.newSitio = { nombre: '', url: '', icono: '', descripcion: '', categoria: 'personal' };
     this.formError = '';
   }
 
@@ -481,9 +531,10 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   async agregarSitio() {
-    let { nombre, url, icono, categoria } = this.newSitio;
+    let { nombre, url, icono, descripcion, categoria } = this.newSitio;
     nombre = nombre.trim();
     url = url.trim();
+    descripcion = descripcion.trim();
 
     if (!nombre || !url) {
       this.formError = 'Nombre y URL son obligatorios.';
@@ -498,7 +549,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.formError = '';
 
     try {
-      await this.supabaseService.addSitio(nombre, url, iconoFinal, categoria);
+      await this.supabaseService.addSitio(nombre, url, iconoFinal, categoria, descripcion);
       await this.loadSitios();
       this.showToast('¡Sitio agregado con éxito!');
       this.cerrarModal();
@@ -547,6 +598,7 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   abrirNotas() {
+    this.cerrarDropdowns();
     this.notasPanelOpen = true;
     this.loadNotas();
   }
