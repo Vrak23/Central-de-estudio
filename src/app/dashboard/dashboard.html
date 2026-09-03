@@ -136,38 +136,13 @@
 </header>
 
 <div class="container">
-  <!-- PANTALLA DE SELECCIÓN INICIAL -->
-  <div *ngIf="activeSection === 'main'" class="selection-screen" id="main-selection">
-    <h2 style="text-align:center; color:var(--text-dim); margin-bottom:2rem; border:none;">
-      ¿A dónde vamos hoy, {{ userName }}?
-    </h2>
-    <div class="grid-selection">
-      <div class="selection-card" (click)="showSection('senati')">
-        <div class="icon">🎓</div>
-        <h3>Portales SENATI</h3>
-        <p>Blackboard, GitHub, Drive y tus sitios.</p>
-      </div>
-      <a href="https://senati-portal.vercel.app/" target="_blank" class="selection-card" style="text-decoration: none; color: inherit;">
-        <div class="icon">📚</div>
-        <h3>Portal Académico SENATI</h3>
-        <p>Tareas, Notificaciones y Calculadora Blackboard.</p>
-      </a>
-      <div class="selection-card" (click)="showSection('local')">
-        <div class="icon">💻</div>
-        <h3>Laboratorio Local</h3>
-        <p>Gestión de Bases de Datos y Proyectos PHP.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECCIÓN DE PORTALES -->
-  <div *ngIf="activeSection === 'senati'" id="senati-section" class="content-section">
-    <div style="margin-bottom:1.5rem; display:flex; align-items:center; gap:1rem;">
-      <button (click)="hideSections()" class="back-btn">← Volver al Menú</button>
+  <!-- SECCIÓN PRINCIPAL DE PORTALES & SITIOS -->
+  <div class="content-section" style="margin-top: 1rem;">
+    <div style="margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+      <h2 style="margin:0; border:none;">PORTALES FIJOS</h2>
       <button (click)="abrirModal()" class="add-btn">+ Agregar sitio</button>
     </div>
 
-    <h2>PORTALES FIJOS</h2>
     <div class="grid">
       <!-- Portales predefinidos estáticos -->
       <a href="https://senati.blackboard.com/" target="_blank" class="card">
@@ -209,7 +184,7 @@
       </div>
     </div>
 
-    <h2 style="margin-top:2rem;">MIS SITIOS</h2>
+    <h2 style="margin-top:2.5rem;">MIS SITIOS</h2>
     <div class="grid" id="grid-sitios">
       <div *ngIf="getSitiosPorCategoria('personal').length === 0" id="sin-sitios" style="color:var(--text-dim); grid-column: 1 / -1; text-align: center; padding: 2rem 0;">
         Aún no tienes sitios guardados. Agrega uno con el botón de arriba.
@@ -227,21 +202,6 @@
           <div class="card-title">{{ sitio.nombre }}</div>
           <p class="card-url">{{ sitio.url }}</p>
         </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECCIÓN LOCAL -->
-  <div *ngIf="activeSection === 'local'" id="local-section" class="content-section">
-    <div style="margin-bottom:1.5rem;">
-      <button (click)="hideSections()" class="back-btn">← Volver al Menú</button>
-    </div>
-    <h2>LABORATORIO LOCAL</h2>
-    <div class="grid">
-      <div *ngFor="let db of myProjects" class="card">
-        <div class="card-type">Base de Datos</div>
-        <div class="card-title">{{ db }}</div>
-        <span class="db-badge">MySQL</span>
       </div>
     </div>
   </div>
