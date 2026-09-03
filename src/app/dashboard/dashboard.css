@@ -1,5 +1,5 @@
 /* =================================================== */
-/* CENTRAL HUB - CENTRO DE COMANDO DIARIO STYLES       */
+/* CENTRAL HUB - STYLES                                */
 /* =================================================== */
 
 :host {
@@ -834,8 +834,8 @@ header {
 }
 
 .card-logo img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
@@ -1105,7 +1105,7 @@ header {
 }
 
 /* =================================================== */
-/* SPOTLIGHT MODAL                                     */
+/* SPOTLIGHT QUICK SEARCH MODAL (CTRL + K)             */
 /* =================================================== */
 .spotlight-backdrop {
   position: fixed;
@@ -1121,7 +1121,7 @@ header {
 }
 
 .spotlight-container {
-  width: min(92vw, 520px);
+  width: min(92vw, 500px);
   background: #141419;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1193,6 +1193,7 @@ header {
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s ease;
+  min-width: 0;
 }
 
 .spotlight-result-item:hover {
@@ -1213,6 +1214,7 @@ header {
   width: 20px;
   height: 20px;
   object-fit: contain;
+  display: block;
 }
 
 .spotlight-item-details {
@@ -1224,6 +1226,9 @@ header {
   font-size: 0.8rem;
   font-weight: 600;
   color: #ffffff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .spotlight-item-sub {
@@ -1241,6 +1246,7 @@ header {
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-dim);
+  flex-shrink: 0;
 }
 
 /* =================================================== */

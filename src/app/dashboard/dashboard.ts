@@ -212,7 +212,24 @@ export class Dashboard implements OnInit, OnDestroy {
       if (this.senatiDrawerOpen) {
         this.cerrarSenatiDrawer();
       }
+    } else if (event.key === 'Enter' && this.spotlightOpen) {
+      if (this.spotlightResults.length > 0) {
+        event.preventDefault();
+        const first = this.spotlightResults[0];
+        first.action();
+        this.spotlightOpen = false;
+        this.refreshView();
+      }
     }
+  }
+
+  isImageUrl(icon?: string): boolean {
+    if (!icon) return false;
+    const clean = icon.trim();
+    if (clean.startsWith('/') || clean.startsWith('./') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:image/')) {
+      return true;
+    }
+    return /\.(png|jpe?g|svg|webp|ico|gif)$/i.test(clean);
   }
 
   // Listener global para cerrar cualquier dropdown o modal al dar clic fuera
@@ -493,10 +510,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   get sitiosPersonales() {
     return this.sitios.filter(s => s.categoria === 'personal');
-  }
-
-  isImageUrl(url: string): boolean {
-    return url.startsWith('http://') || url.startsWith('https://');
   }
 
   abrirModal() {
