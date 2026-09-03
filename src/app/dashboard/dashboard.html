@@ -67,6 +67,50 @@
     </div>
 
     <div class="header-right">
+      <!-- BOTÓN APPS DROPDOWN -->
+      <details class="hamburger-menu apps-dropdown">
+        <summary class="apps-button" title="Ecosistema de Apps">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px; flex-shrink: 0;">
+            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+          </svg>
+          <span>Apps</span>
+        </summary>
+
+        <div class="menu-panel apps-panel">
+          <div class="apps-panel-header">
+            <span class="apps-header-title">Ecosistema de Apps</span>
+            <span class="apps-count-badge">1 Activa</span>
+          </div>
+
+          <div class="apps-list">
+            <!-- SENATI PORTAL -->
+            <a href="https://senati-portal.vercel.app/" target="_blank" class="app-item-card">
+              <div class="app-item-icon" style="background: rgba(2, 132, 199, 0.18); color: #38bdf8;">
+                📚
+              </div>
+              <div class="app-item-info">
+                <div class="app-item-name">SENATI Portal</div>
+                <div class="app-item-desc">Tareas, Cursos y Entregas</div>
+              </div>
+              <span class="app-item-badge active">Activo</span>
+            </a>
+
+            <!-- FINANZAS (PROXIMAMENTE) -->
+            <div class="app-item-card disabled">
+              <div class="app-item-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                💰
+              </div>
+              <div class="app-item-info">
+                <div class="app-item-name">Finanzas</div>
+                <div class="app-item-desc">Gestión y Ahorros</div>
+              </div>
+              <span class="app-item-badge soon">Pronto</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- MENÚ HAMBURGUESA PERFIL / OPCIONES -->
       <details class="hamburger-menu">
         <summary class="hamburger-button" title="Menú">
           <span></span>
@@ -103,6 +147,11 @@
         <h3>Portales SENATI</h3>
         <p>Blackboard, GitHub, Drive y tus sitios.</p>
       </div>
+      <a href="https://senati-portal.vercel.app/" target="_blank" class="selection-card" style="text-decoration: none; color: inherit;">
+        <div class="icon">📚</div>
+        <h3>Portal Académico SENATI</h3>
+        <p>Tareas, Notificaciones y Calculadora Blackboard.</p>
+      </a>
       <div class="selection-card" (click)="showSection('local')">
         <div class="icon">💻</div>
         <h3>Laboratorio Local</h3>
