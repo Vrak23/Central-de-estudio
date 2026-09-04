@@ -276,7 +276,10 @@
 
         <!-- Sitios Personales -->
         <div *ngFor="let sitio of sitiosPersonales" class="card card-custom" [id]="'sitio-' + sitio.id">
-          <button class="btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar sitio">✕</button>
+          <div class="card-custom-actions">
+            <button class="btn-card-action btn-editar" (click)="abrirModalEditar(sitio, $event)" title="Editar sitio">✎</button>
+            <button class="btn-card-action btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar sitio">✕</button>
+          </div>
           <a [href]="sitio.url" target="_blank" class="card-link">
             <div class="card-logo-dyn">
               <img *ngIf="isImageUrl(sitio.icono); else showEmoji" [src]="sitio.icono" alt="Icono" class="dyn-icon-img" />
@@ -393,7 +396,7 @@
 <!-- ==================================================== -->
 <div *ngIf="modalAddSitioOpen" id="modal-overlay" class="backdrop-fade-in" (click)="cerrarModal()">
   <div id="modal-box" (click)="$event.stopPropagation()">
-    <h3>Agregar nuevo sitio</h3>
+    <h3>{{ sitioEnEdicion ? 'Editar sitio' : 'Agregar nuevo sitio' }}</h3>
 
     <div class="modal-field">
       <label for="input-categoria">Categoría</label>
@@ -424,7 +427,7 @@
     </p>
 
     <div class="modal-actions">
-      <button class="btn-guardar" (click)="agregarSitio()">Guardar</button>
+      <button class="btn-guardar" (click)="agregarSitio()">{{ sitioEnEdicion ? 'Guardar cambios' : 'Guardar' }}</button>
       <button class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
     </div>
   </div>

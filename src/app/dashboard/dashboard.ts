@@ -162,6 +162,7 @@ export class Dashboard implements OnInit, OnDestroy {
   notasPanelOpen = false;
   modalAddSitioOpen = false;
 
+  sitioEnEdicion: any = null;
   newSitio = {
     nombre: '',
     url: '',
@@ -513,12 +514,32 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   abrirModal() {
+    this.sitioEnEdicion = null;
+    this.newSitio = { nombre: '', url: '', icono: '', descripcion: '', categoria: 'personal' };
+    this.modalAddSitioOpen = true;
+    this.formError = '';
+  }
+
+  abrirModalEditar(sitio: any, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.sitioEnEdicion = sitio;
+    this.newSitio = {
+      nombre: sitio.nombre || '',
+      url: sitio.url || '',
+      icono: sitio.icono || '',
+      descripcion: sitio.descripcion || '',
+      categoria: sitio.categoria || 'personal'
+    };
     this.modalAddSitioOpen = true;
     this.formError = '';
   }
 
   cerrarModal() {
     this.modalAddSitioOpen = false;
+    this.sitioEnEdicion = null;
     this.newSitio = { nombre: '', url: '', icono: '', descripcion: '', categoria: 'personal' };
     this.formError = '';
   }
@@ -562,9 +583,15 @@ export class Dashboard implements OnInit, OnDestroy {
     this.formError = '';
 
     try {
-      await this.supabaseService.addSitio(nombre, url, iconoFinal, categoria, descripcion);
-      await this.loadSitios();
-      this.showToast('¡Sitio agregado con éxito!');
+      if (this.sitioEnEdicion) {
+        await this.supabaseService.updateSitio(this.sitioEnEdicion.id, nombre, url, iconoFinal, categoria, descripcion);
+        await this.loadSitios();
+        this.showToast('¡Sitio actualizado con éxito!');
+      } else {
+        await this.supabaseService.addSitio(nombre, url, iconoFinal, categoria, descripcion);
+        await this.loadSitios();
+        this.showToast('¡Sitio agregado con éxito!');
+      }
       this.cerrarModal();
       this.refreshView();
     } catch (err: any) {

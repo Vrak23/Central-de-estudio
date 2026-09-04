@@ -906,22 +906,47 @@ header {
   margin: 0;
 }
 
-.btn-eliminar {
+.card-custom-actions {
   position: absolute;
   top: 6px;
   right: 6px;
-  background: transparent;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 2;
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+
+.card-custom:hover .card-custom-actions {
+  opacity: 1;
+}
+
+.btn-card-action {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-dim);
   cursor: pointer;
   font-size: 0.72rem;
-  padding: 2px 4px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   transition: all 0.15s ease;
+  padding: 0;
+}
+
+.btn-editar:hover {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: #f97316;
 }
 
 .btn-eliminar:hover {
   background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
   color: #ef4444;
 }
 

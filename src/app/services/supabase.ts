@@ -100,6 +100,24 @@ export class SupabaseService {
     return data;
   }
 
+  async updateSitio(id: number, nombre: string, url: string, icono: string, categoria: 'personal' | 'fijo', descripcion: string = '') {
+    const { data, error } = await this.supabase
+      .from('sitios')
+      .update({
+        nombre,
+        url,
+        icono: icono || '🌐',
+        categoria,
+        descripcion
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
   async deleteSitio(id: number) {
     const { error } = await this.supabase
       .from('sitios')
