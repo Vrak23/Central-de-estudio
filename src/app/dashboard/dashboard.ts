@@ -100,86 +100,86 @@ export class Dashboard implements OnInit, OnDestroy {
     }
   ];
 
-  // Catálogo Completo de Chuletas Dev
+  // Catálogo Completo de Chuletas Dev (Ordenados por Flujo de Trabajo Natural)
   comandosDev: DevComando[] = [
-    // Angular
-    { tech: 'Angular', nombre: 'Iniciar Servidor Local', comando: 'ng serve --port 4200', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Iniciar con Apertura Automática', comando: 'ng serve -o', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Compilar Producción', comando: 'ng build', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Componente', comando: 'ng g c nombre-componente', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Servicio', comando: 'ng g s services/nombre', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Módulo', comando: 'ng g m nombre-modulo', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Guard de Autenticación', comando: 'ng g g guards/auth', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Interceptor HTTP', comando: 'ng g interceptor core/jwt', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Interface / Modelo', comando: 'ng g i models/usuario', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Generar Pipe Personalizado', comando: 'ng g p pipes/filtro', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Ejecutar Pruebas Unitarias', comando: 'ng test', icono: '🅰️' },
-    { tech: 'Angular', nombre: 'Actualizar Angular CLI y Core', comando: 'ng update @angular/cli @angular/core', icono: '🅰️' },
+    // Angular (Creación -> Desarrollo -> Pruebas -> Build/Update)
+    { tech: 'Angular', nombre: '1. Generar Módulo', comando: 'ng g m nombre-modulo', icono: '🅰️' },
+    { tech: 'Angular', nombre: '2. Generar Componente', comando: 'ng g c nombre-componente', icono: '🅰️' },
+    { tech: 'Angular', nombre: '3. Generar Servicio', comando: 'ng g s services/nombre', icono: '🅰️' },
+    { tech: 'Angular', nombre: '4. Generar Interface / Modelo', comando: 'ng g i models/usuario', icono: '🅰️' },
+    { tech: 'Angular', nombre: '5. Generar Guard de Autenticación', comando: 'ng g g guards/auth', icono: '🅰️' },
+    { tech: 'Angular', nombre: '6. Generar Interceptor HTTP', comando: 'ng g interceptor core/jwt', icono: '🅰️' },
+    { tech: 'Angular', nombre: '7. Generar Pipe Personalizado', comando: 'ng g p pipes/filtro', icono: '🅰️' },
+    { tech: 'Angular', nombre: '8. Iniciar Servidor Local', comando: 'ng serve --port 4200', icono: '🅰️' },
+    { tech: 'Angular', nombre: '9. Iniciar con Apertura Automática', comando: 'ng serve -o', icono: '🅰️' },
+    { tech: 'Angular', nombre: '10. Ejecutar Pruebas Unitarias', comando: 'ng test', icono: '🅰️' },
+    { tech: 'Angular', nombre: '11. Compilar Producción', comando: 'ng build', icono: '🅰️' },
+    { tech: 'Angular', nombre: '12. Actualizar Angular CLI y Core', comando: 'ng update @angular/cli @angular/core', icono: '🅰️' },
     
-    // React / Vite / Next.js
-    { tech: 'React / Vite', nombre: 'Iniciar Servidor de Desarrollo', comando: 'npm run dev', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Crear Proyecto Vite (TS)', comando: 'npm create vite@latest mi-app -- --template react-ts', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Crear Proyecto Vite (JS)', comando: 'npm create vite@latest mi-app -- --template react', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Compilar Bundle de Producción', comando: 'npm run build', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Previsualizar Build Local', comando: 'npm run preview', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Instalar React Router DOM', comando: 'npm i react-router-dom', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Instalar Lucide Icons', comando: 'npm i lucide-react', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Instalar Tailwind CSS + Config', comando: 'npm i -D tailwindcss postcss autoprefixer && npx tailwindcss init -p', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Instalar Axios HTTP', comando: 'npm i axios', icono: '⚡' },
-    { tech: 'React / Vite', nombre: 'Instalar Zustand (Estado Global)', comando: 'npm i zustand', icono: '⚡' },
+    // React / Vite / Next.js (Creación -> Dependencias -> Dev -> Build)
+    { tech: 'React / Vite', nombre: '1. Crear Proyecto Vite (TS)', comando: 'npm create vite@latest mi-app -- --template react-ts', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '2. Crear Proyecto Vite (JS)', comando: 'npm create vite@latest mi-app -- --template react', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '3. Instalar React Router DOM', comando: 'npm i react-router-dom', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '4. Instalar Axios HTTP', comando: 'npm i axios', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '5. Instalar Zustand (Estado Global)', comando: 'npm i zustand', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '6. Instalar Lucide Icons', comando: 'npm i lucide-react', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '7. Instalar Tailwind CSS + Config', comando: 'npm i -D tailwindcss postcss autoprefixer && npx tailwindcss init -p', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '8. Iniciar Servidor de Desarrollo', comando: 'npm run dev', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '9. Compilar Bundle de Producción', comando: 'npm run build', icono: '⚡' },
+    { tech: 'React / Vite', nombre: '10. Previsualizar Build Local', comando: 'npm run preview', icono: '⚡' },
     { tech: 'Next.js', nombre: 'Iniciar Servidor Next.js', comando: 'npx next dev', icono: '▲' },
     
-    // Node.js
-    { tech: 'Node.js', nombre: 'Inicializar Proyecto (package.json)', comando: 'npm init -y', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Ejecutar con Reinicio Automático', comando: 'npx nodemon index.js', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Ejecutar con Node Nativo (--watch)', comando: 'node --watch server.js', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Ejecutar TypeScript Directo', comando: 'npx tsx server.ts', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Instalar Dependencias de package.json', comando: 'npm install', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Instalar Express y CORS', comando: 'npm i express cors dotenv', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Instalar TypeScript & Types (Dev)', comando: 'npm i -D typescript @types/node tsx', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Verificar Paquetes Desactualizados', comando: 'npm outdated', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Limpiar Caché de NPM', comando: 'npm cache clean --force', icono: '🟢' },
-    { tech: 'Node.js', nombre: 'Auditar Vulnerabilidades y Reparar', comando: 'npm audit fix', icono: '🟢' },
+    // Node.js (Init -> Paquetes -> Desarrollo -> Mantenimiento)
+    { tech: 'Node.js', nombre: '1. Inicializar Proyecto (package.json)', comando: 'npm init -y', icono: '🟢' },
+    { tech: 'Node.js', nombre: '2. Instalar Dependencias de package.json', comando: 'npm install', icono: '🟢' },
+    { tech: 'Node.js', nombre: '3. Instalar Express, CORS y Dotenv', comando: 'npm i express cors dotenv', icono: '🟢' },
+    { tech: 'Node.js', nombre: '4. Instalar TypeScript & Types (Dev)', comando: 'npm i -D typescript @types/node tsx', icono: '🟢' },
+    { tech: 'Node.js', nombre: '5. Ejecutar con Node Nativo (--watch)', comando: 'node --watch server.js', icono: '🟢' },
+    { tech: 'Node.js', nombre: '6. Ejecutar con Reinicio Automático', comando: 'npx nodemon index.js', icono: '🟢' },
+    { tech: 'Node.js', nombre: '7. Ejecutar TypeScript Directo', comando: 'npx tsx server.ts', icono: '🟢' },
+    { tech: 'Node.js', nombre: '8. Verificar Paquetes Desactualizados', comando: 'npm outdated', icono: '🟢' },
+    { tech: 'Node.js', nombre: '9. Auditar Vulnerabilidades y Reparar', comando: 'npm audit fix', icono: '🟢' },
+    { tech: 'Node.js', nombre: '10. Limpiar Caché de NPM', comando: 'npm cache clean --force', icono: '🟢' },
     
-    // PHP / XAMPP / Laravel
+    // PHP / XAMPP / Laravel (Creación -> Config -> BD -> Dev/Servidor -> Cleanup)
     { tech: 'PHP / XAMPP', nombre: 'Servidor PHP Integrado', comando: 'php -S localhost:8000', icono: '🐘' },
     { tech: 'PHP / XAMPP', nombre: 'Servidor PHP con Carpeta Pública', comando: 'php -S localhost:8000 -t public', icono: '🐘' },
-    { tech: 'Laravel', nombre: 'Crear Proyecto Nuevo Laravel', comando: 'composer create-project laravel/laravel mi-app', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Iniciar Servidor Artisan', comando: 'php artisan serve', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Ejecutar Migraciones', comando: 'php artisan migrate', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Crear Modelo + Migración + Control', comando: 'php artisan make:model Producto -mc', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Crear Control API Resource', comando: 'php artisan make:controller Api/ProductoController --api', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Revertir Última Migración', comando: 'php artisan migrate:rollback', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Resetear BD y Ejecutar Seeders', comando: 'php artisan migrate:fresh --seed', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Limpiar Cachés Generales', comando: 'php artisan optimize:clear', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Listar Todas las Rutas', comando: 'php artisan route:list', icono: '🔴' },
-    { tech: 'Laravel', nombre: 'Generar Key de Aplicación', comando: 'php artisan key:generate', icono: '🔴' },
+    { tech: 'Laravel', nombre: '1. Crear Proyecto Nuevo Laravel', comando: 'composer create-project laravel/laravel mi-app', icono: '🔴' },
+    { tech: 'Laravel', nombre: '2. Generar Key de Aplicación', comando: 'php artisan key:generate', icono: '🔴' },
+    { tech: 'Laravel', nombre: '3. Crear Modelo + Migración + Control', comando: 'php artisan make:model Producto -mc', icono: '🔴' },
+    { tech: 'Laravel', nombre: '4. Crear Control API Resource', comando: 'php artisan make:controller Api/ProductoController --api', icono: '🔴' },
+    { tech: 'Laravel', nombre: '5. Ejecutar Migraciones', comando: 'php artisan migrate', icono: '🔴' },
+    { tech: 'Laravel', nombre: '6. Revertir Última Migración', comando: 'php artisan migrate:rollback', icono: '🔴' },
+    { tech: 'Laravel', nombre: '7. Resetear BD y Ejecutar Seeders', comando: 'php artisan migrate:fresh --seed', icono: '🔴' },
+    { tech: 'Laravel', nombre: '8. Listar Todas las Rutas', comando: 'php artisan route:list', icono: '🔴' },
+    { tech: 'Laravel', nombre: '9. Iniciar Servidor Artisan', comando: 'php artisan serve', icono: '🔴' },
+    { tech: 'Laravel', nombre: '10. Limpiar Cachés Generales', comando: 'php artisan optimize:clear', icono: '🔴' },
     
-    // Python / FastAPI / Django
-    { tech: 'Python', nombre: 'Servidor Uvicorn / FastAPI', comando: 'uvicorn main:app --reload --port 8000', icono: '🐍' },
-    { tech: 'Python', nombre: 'Crear Entorno Virtual', comando: 'python -m venv venv', icono: '🐍' },
-    { tech: 'Python', nombre: 'Activar Entorno (Windows)', comando: '.\\venv\\Scripts\\activate', icono: '🐍' },
-    { tech: 'Python', nombre: 'Instalar Requerimientos', comando: 'pip install -r requirements.txt', icono: '🐍' },
+    // Python / FastAPI / Django (Entorno -> Packages -> Serve)
+    { tech: 'Python', nombre: '1. Crear Entorno Virtual', comando: 'python -m venv venv', icono: '🐍' },
+    { tech: 'Python', nombre: '2. Activar Entorno (Windows)', comando: '.\\venv\\Scripts\\activate', icono: '🐍' },
+    { tech: 'Python', nombre: '3. Instalar Requerimientos', comando: 'pip install -r requirements.txt', icono: '🐍' },
+    { tech: 'Python', nombre: '4. Servidor Uvicorn / FastAPI', comando: 'uvicorn main:app --reload --port 8000', icono: '🐍' },
     { tech: 'Django', nombre: 'Iniciar Servidor Django', comando: 'python manage.py runserver', icono: '🟩' },
     
-    // Git
-    { tech: 'Git', nombre: 'Inicializar Repositorio', comando: 'git init', icono: '🐙' },
-    { tech: 'Git', nombre: 'Clonar Repositorio', comando: 'git clone <url-repositorio>', icono: '🐙' },
-    { tech: 'Git', nombre: 'Sincronizar y Subir Cambios', comando: 'git add . && git commit -m "update" && git push', icono: '🐙' },
-    { tech: 'Git', nombre: 'Ver Estado de Archivos', comando: 'git status', icono: '🐙' },
-    { tech: 'Git', nombre: 'Actualizar desde Remoto', comando: 'git pull origin main', icono: '🐙' },
-    { tech: 'Git', nombre: 'Crear y Cambiar a Nueva Rama', comando: 'git checkout -b feature/nueva-rama', icono: '🐙' },
-    { tech: 'Git', nombre: 'Guardar Cambios Temporalmente', comando: 'git stash', icono: '🐙' },
-    { tech: 'Git', nombre: 'Recuperar Cambios Guardados', comando: 'git stash pop', icono: '🐙' },
-    { tech: 'Git', nombre: 'Ver Historial de Commits', comando: 'git log --oneline -n 10', icono: '🐙' },
-    { tech: 'Git', nombre: 'Deshacer Último Commit Local', comando: 'git reset --soft HEAD~1', icono: '🐙' },
-    { tech: 'Git', nombre: 'Fusionar Rama en la Actual', comando: 'git merge feature/nueva-rama', icono: '🐙' },
-    { tech: 'Git', nombre: 'Eliminar Rama Local', comando: 'git branch -d nombre-rama', icono: '🐙' },
+    // Git (Init/Clone -> Branching -> Commits/Push -> Stash -> Merge -> Cleanup)
+    { tech: 'Git', nombre: '1. Inicializar Repositorio Local', comando: 'git init', icono: '🐙' },
+    { tech: 'Git', nombre: '2. Clonar Repositorio Remoto', comando: 'git clone <url-repositorio>', icono: '🐙' },
+    { tech: 'Git', nombre: '3. Ver Estado de Archivos', comando: 'git status', icono: '🐙' },
+    { tech: 'Git', nombre: '4. Actualizar desde Remoto', comando: 'git pull origin main', icono: '🐙' },
+    { tech: 'Git', nombre: '5. Crear y Cambiar a Nueva Rama', comando: 'git checkout -b feature/nueva-rama', icono: '🐙' },
+    { tech: 'Git', nombre: '6. Sincronizar y Subir Cambios', comando: 'git add . && git commit -m "update" && git push', icono: '🐙' },
+    { tech: 'Git', nombre: '7. Guardar Cambios Temporalmente', comando: 'git stash', icono: '🐙' },
+    { tech: 'Git', nombre: '8. Recuperar Cambios Guardados', comando: 'git stash pop', icono: '🐙' },
+    { tech: 'Git', nombre: '9. Ver Historial de Commits', comando: 'git log --oneline -n 10', icono: '🐙' },
+    { tech: 'Git', nombre: '10. Fusionar Rama en la Actual', comando: 'git merge feature/nueva-rama', icono: '🐙' },
+    { tech: 'Git', nombre: '11. Deshacer Último Commit Local', comando: 'git reset --soft HEAD~1', icono: '🐙' },
+    { tech: 'Git', nombre: '12. Eliminar Rama Local', comando: 'git branch -d nombre-rama', icono: '🐙' },
     
     // Docker
-    { tech: 'Docker', nombre: 'Levantar Contenedores en Fondo', comando: 'docker compose up -d', icono: '🐳' },
-    { tech: 'Docker', nombre: 'Detener Contenedores', comando: 'docker compose down', icono: '🐳' },
-    { tech: 'Docker', nombre: 'Ver Contenedores Activos', comando: 'docker ps', icono: '🐳' }
+    { tech: 'Docker', nombre: '1. Levantar Contenedores en Fondo', comando: 'docker compose up -d', icono: '🐳' },
+    { tech: 'Docker', nombre: '2. Ver Contenedores Activos', comando: 'docker ps', icono: '🐳' },
+    { tech: 'Docker', nombre: '3. Detener Contenedores', comando: 'docker compose down', icono: '🐳' }
   ];
 
   filtroTechComandos = 'todos';
