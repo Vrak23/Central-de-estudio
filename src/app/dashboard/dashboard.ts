@@ -257,7 +257,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   // --- ECOSISTEMA URLS (LOCAL & PROD) ---
   senatiPortalUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:4201' : 'https://senati-portal.vercel.app/';
-  bitacoraUrl = 'http://localhost:5173';
+  bitacoraUrl = 'https://bitacora-senati.vercel.app/';
 
   constructor(
     private supabaseService: SupabaseService,
