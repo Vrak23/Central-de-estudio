@@ -20,7 +20,7 @@
   <div class="drawer-content">
     <div class="drawer-portal-banner">
       <span>Portal Académico SENATI</span>
-      <a href="https://senati-portal.vercel.app/" target="_blank" class="drawer-portal-link">
+      <a [href]="senatiPortalUrl" target="_blank" class="drawer-portal-link">
         Abrir portal →
       </a>
     </div>
@@ -149,12 +149,12 @@
         <div class="menu-panel apps-panel">
           <div class="apps-panel-header">
             <span class="apps-header-title">Ecosistema de Apps</span>
-            <span class="apps-count-badge">1 Activa</span>
+            <span class="apps-count-badge">2 Activas</span>
           </div>
 
           <div class="apps-list">
             <!-- SENATI PORTAL -->
-            <a href="https://senati-portal.vercel.app/" target="_blank" class="app-item-card">
+            <a [href]="senatiPortalUrl" target="_blank" class="app-item-card">
               <div class="app-item-icon" style="background: rgba(2, 132, 199, 0.18); color: #38bdf8;">
                 📚
               </div>
@@ -165,17 +165,17 @@
               <span class="app-item-badge active">Activo</span>
             </a>
 
-            <!-- FINANZAS (PROXIMAMENTE) -->
-            <div class="app-item-card disabled">
-              <div class="app-item-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
-                💰
+            <!-- BITÁCORA SENATI -->
+            <a [href]="bitacoraUrl" target="_blank" class="app-item-card">
+              <div class="app-item-icon" style="background: rgba(16, 185, 129, 0.18); color: #34d399;">
+                📋
               </div>
               <div class="app-item-info">
-                <div class="app-item-name">Finanzas</div>
-                <div class="app-item-desc">Gestión y Ahorros</div>
+                <div class="app-item-name">Bitácora SENATI</div>
+                <div class="app-item-desc">Informes Semanales (Dual)</div>
               </div>
-              <span class="app-item-badge soon">Pronto</span>
-            </div>
+              <span class="app-item-badge active">Activo</span>
+            </a>
           </div>
         </div>
       </details>
@@ -227,15 +227,55 @@
   <!-- VISTA 1: DASHBOARD PRINCIPAL                         -->
   <!-- ==================================================== -->
   <main *ngIf="vistaActiva === 'dashboard'" class="dashboard-fade-in">
-    <!-- BANNER SALUDO & BOTÓN CUADRADO DESKTOP TAREAS -->
+    <!-- BANNER SALUDO & ACCESOS RÁPIDOS DINÁMICOS -->
     <section class="command-hero">
       <div class="greeting-box">
         <h2 class="hero-title">{{ saludo }}, <span class="highlight-name">{{ userName }}</span></h2>
-        <p class="hero-subtitle">Centro de comando listo. ¿En qué trabajaremos hoy?</p>
+        <p class="hero-subtitle">Centro de comando listo • Informática y Desarrollo Web</p>
       </div>
 
-      <!-- BOTÓN CUADRADO TRIGGER DESKTOP (SLIDE A LA IZQUIERDA) -->
       <div class="hero-desktop-trigger-box">
+        <!-- WIDGET DINÁMICO CLASE DE HOY -->
+        <div class="today-class-card" [class.live]="claseActual">
+          <div class="today-card-badge-row">
+            <span class="live-dot" *ngIf="claseActual"></span>
+            <span class="today-badge-label">
+              {{ claseActual ? 'Clase En Vivo' : (proximaClase ? 'Próxima Clase Hoy' : (clasesHoy.length > 0 ? 'Clases de Hoy' : 'Hoy Libre')) }}
+            </span>
+            <span class="today-time-badge" *ngIf="claseActual || proximaClase">
+              🕒 {{ (claseActual || proximaClase)?.horaFormateada }}
+            </span>
+          </div>
+
+          <div class="today-course-main">
+            <div class="today-course-name">
+              {{ (claseActual || proximaClase)?.nombre || (clasesHoy.length > 0 ? 'Tienes ' + clasesHoy.length + ' materias hoy' : 'Sin clases programadas para hoy') }}
+            </div>
+            <div class="today-course-prof" *ngIf="(claseActual || proximaClase)?.profesor">
+              Docente: {{ (claseActual || proximaClase)?.profesor }}
+            </div>
+          </div>
+
+          <!-- BOTONES RÁPIDOS TEAMS / BLACKBOARD -->
+          <div class="today-actions-row" *ngIf="claseActual || proximaClase">
+            <a *ngIf="(claseActual || proximaClase)?.link_teams" 
+               [href]="(claseActual || proximaClase)?.link_teams" 
+               target="_blank" 
+               class="btn-today-action btn-teams" 
+               title="Unirse a reunión Teams">
+              🎥 Teams
+            </a>
+            <a *ngIf="(claseActual || proximaClase)?.link_blackboard" 
+               [href]="(claseActual || proximaClase)?.link_blackboard" 
+               target="_blank" 
+               class="btn-today-action btn-bb" 
+               title="Abrir aula en Blackboard">
+              📖 Blackboard
+            </a>
+          </div>
+        </div>
+
+        <!-- BOTÓN CUADRADO TRIGGER DESKTOP (SLIDE A LA IZQUIERDA) -->
         <button 
           type="button" 
           (click)="abrirSenatiDrawer()" 
@@ -293,6 +333,99 @@
             </div>
           </a>
         </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN GITHUB DEV REPOSITORIOS -->
+    <section class="dashboard-block github-section">
+      <div class="section-title-row gh-section-title-row">
+        <div class="github-heading-left">
+          <span class="github-brand-icon">🐙</span>
+          <h2 class="clean-section-title">GitHub Repositorios</h2>
+          <span class="github-handle-badge" *ngIf="githubUser">@{{ githubUser.login }}</span>
+          <span class="github-count-badge" *ngIf="githubRepos.length > 0">
+            {{ reposExpandidos ? (githubRepos.length + ' repos') : (reposVisibles.length + ' de ' + githubRepos.length) }}
+          </span>
+        </div>
+
+        <div class="github-heading-right">
+          <button *ngIf="githubRepos.length > 3" (click)="toggleExpandirRepos()" class="btn-gh-toggle-mini" [title]="reposExpandidos ? 'Minimizar a 3' : 'Desplegar todos'">
+            {{ reposExpandidos ? '▲ Minimizar' : '▼ Ver todos (' + githubRepos.length + ')' }}
+          </button>
+          <button *ngIf="!editingGithubUser" (click)="iniciarEdicionGithub()" class="btn-gh-config" title="Cambiar usuario de GitHub">
+            ⚙️ @{{ githubUsername }}
+          </button>
+          <a href="https://github.com/new" target="_blank" class="add-btn">+ Nuevo Repo</a>
+        </div>
+      </div>
+
+      <!-- BARRA DE EDICIÓN DE USUARIO GITHUB -->
+      <div *ngIf="editingGithubUser" class="github-edit-bar">
+        <div class="github-edit-fields">
+          <div class="gh-field-group">
+            <label class="github-bar-label">Usuario:</label>
+            <input type="text" [(ngModel)]="githubInput" placeholder="Ej: Vrak23" (keyup.enter)="guardarGithubUser()" class="gh-input-field" />
+          </div>
+          <div class="gh-field-group">
+            <label class="github-bar-label">Token Personal (PAT - necesario para repos privados):</label>
+            <input type="password" [(ngModel)]="githubTokenInput" placeholder="ghp_... (opcional)" (keyup.enter)="guardarGithubUser()" class="gh-input-field gh-token-input" />
+            <a href="https://github.com/settings/tokens" target="_blank" class="gh-help-hint" title="Crear token clásico con permiso repo">Crear token clásico (con permiso 'repo') ↗</a>
+          </div>
+        </div>
+        <div class="gh-edit-actions">
+          <button (click)="guardarGithubUser()" class="btn-gh-save">Guardar</button>
+          <button (click)="cancelarEdicionGithub()" class="btn-gh-cancel">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- LOADING O ERROR -->
+      <div *ngIf="loadingGithub" class="gh-status-msg">
+        ⏳ Sincronizando repositorios desde GitHub...
+      </div>
+      <div *ngIf="githubError && !loadingGithub" class="gh-error-box">
+        {{ githubError }} — <button (click)="iniciarEdicionGithub()" class="gh-btn-link">Configurar</button>
+      </div>
+
+      <!-- MENSAJE SI NO HAY REPOS VISIBLES -->
+      <div class="gh-empty-box" *ngIf="!loadingGithub && githubRepos.length === 0 && !githubError">
+        <p class="gh-empty-title">No se encontraron repositorios públicos visibles para <strong>@{{ githubUsername }}</strong>.</p>
+        <p class="gh-empty-hint" *ngIf="!githubToken">
+          🔒 Como tus repositorios son <strong>privados</strong>, haz clic en <button (click)="iniciarEdicionGithub()" class="gh-btn-link">⚙️ Configurar</button> y pega un <strong>Token Personal (PAT)</strong> con permiso <code>repo</code> para listarlos aquí automáticamente.
+        </p>
+      </div>
+
+      <!-- GRID DE REPOSITORIOS RECIENTES (MINIMIZADOS POR DEFECTO A 3) -->
+      <div class="github-repos-grid" *ngIf="!loadingGithub && githubRepos.length > 0">
+        <a *ngFor="let repo of reposVisibles" [href]="repo.html_url" target="_blank" class="github-repo-card">
+          <div class="repo-card-top">
+            <div class="repo-title-box">
+              <span class="repo-book-icon">📦</span>
+              <span class="repo-title" [title]="repo.name">{{ repo.name }}</span>
+            </div>
+            <span class="repo-badge-vis">{{ repo.private ? 'Privado' : 'Público' }}</span>
+          </div>
+
+          <p class="repo-desc">{{ repo.description || 'Sin descripción en el repositorio.' }}</p>
+
+          <div class="repo-card-bottom">
+            <span class="repo-lang" *ngIf="repo.language">
+              <span class="lang-color-dot" [style.backgroundColor]="getLangColor(repo.language)"></span>
+              {{ repo.language }}
+            </span>
+            <span class="repo-stat" *ngIf="repo.stargazers_count > 0">⭐ {{ repo.stargazers_count }}</span>
+            <span class="repo-date">🕒 {{ formatDateSenati(repo.updated_at) }}</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- BOTÓN PRINCIPAL PARA DESPLEGAR TODOS / MINIMIZAR -->
+      <div class="github-toggle-container" *ngIf="!loadingGithub && githubRepos.length > 3">
+        <button (click)="toggleExpandirRepos()" class="btn-toggle-repos" [class.expanded]="reposExpandidos">
+          <span class="toggle-icon">{{ reposExpandidos ? '▲' : '▼' }}</span>
+          <span class="toggle-text">
+            {{ reposExpandidos ? 'Minimizar repositorios (mostrar solo 3 recientes)' : 'Desplegar todos los repositorios (' + githubRepos.length + ')' }}
+          </span>
+        </button>
       </div>
     </section>
   </main>

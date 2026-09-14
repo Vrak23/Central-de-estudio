@@ -219,4 +219,22 @@ export class SupabaseService {
     if (error) throw error;
     return data;
   }
+
+  // --- SENATI CURSOS & HORARIO ---
+  async getCursosSenati() {
+    const user = await this.getUser();
+    if (!user) return [];
+
+    const { data, error } = await this.supabase
+      .from('senati_cursos')
+      .select('*')
+      .eq('usuario_id', user.id)
+      .order('nombre', { ascending: true });
+
+    if (error) {
+      console.warn('No se pudieron obtener cursos de senati:', error.message);
+      return [];
+    }
+    return data || [];
+  }
 }

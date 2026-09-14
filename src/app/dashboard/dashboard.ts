@@ -225,6 +225,40 @@ export class Dashboard implements OnInit, OnDestroy {
   private toastTimeout?: ReturnType<typeof setTimeout>;
   private clockInterval?: ReturnType<typeof setInterval>;
 
+  // --- SENATI HORARIO & CLASES ---
+  cursosSenati: any[] = [];
+  clasesHoy: any[] = [];
+  claseActual: any = null;
+  proximaClase: any = null;
+  loadingCursosSenati = false;
+
+  // --- GITHUB WIDGET DEV ---
+  githubUsername = localStorage.getItem('central_github_user') || 'Vrak23';
+  githubToken = localStorage.getItem('central_github_token') || '';
+  githubRepos: any[] = [];
+  githubUser: any = null;
+  loadingGithub = false;
+  githubError = '';
+  editingGithubUser = false;
+  githubInput = '';
+  githubTokenInput = '';
+  reposExpandidos = false; // Por defecto minimizados (muestra solo 3)
+
+  get reposVisibles(): any[] {
+    if (this.reposExpandidos) {
+      return this.githubRepos;
+    }
+    return this.githubRepos.slice(0, 3);
+  }
+
+  toggleExpandirRepos() {
+    this.reposExpandidos = !this.reposExpandidos;
+  }
+
+  // --- ECOSISTEMA URLS (LOCAL & PROD) ---
+  senatiPortalUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:4201' : 'https://senati-portal.vercel.app/';
+  bitacoraUrl = 'http://localhost:5173';
+
   constructor(
     private supabaseService: SupabaseService,
     private router: Router,
@@ -309,6 +343,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.updateDateTime();
     this.clockInterval = setInterval(() => {
       this.updateDateTime();
+      this.analizarHorarioSenati();
       this.refreshView();
     }, 60000);
 
@@ -316,6 +351,8 @@ export class Dashboard implements OnInit, OnDestroy {
     await this.loadSitios();
     await this.loadNotas();
     await this.loadTareasSenati();
+    await this.loadCursosSenati();
+    await this.loadGithubData();
     this.refreshView();
   }
 
@@ -418,6 +455,180 @@ export class Dashboard implements OnInit, OnDestroy {
   formatDateSenati(dateStr: string): string {
     const d = new Date(dateStr);
     return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // --- SENATI HORARIO & CLASES ---
+  async loadCursosSenati() {
+    this.loadingCursosSenati = true;
+    try {
+      this.cursosSenati = await this.supabaseService.getCursosSenati();
+      this.analizarHorarioSenati();
+    } catch (e) {
+      console.warn('Error cargando cursos senati:', e);
+    } finally {
+      this.loadingCursosSenati = false;
+      this.refreshView();
+    }
+  }
+
+  analizarHorarioSenati() {
+    const ahora = new Date();
+    const diaIndex = ahora.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mié, 4: Jue, 5: Vie, 6: Sáb
+    const mapDias = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
+    const mapDiasAlt = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+    const diaHoyAbbr = mapDias[diaIndex];
+    const diaHoyAlt = mapDiasAlt[diaIndex];
+
+    const horaActualMinutos = ahora.getHours() * 60 + ahora.getMinutes();
+
+    this.clasesHoy = [];
+    this.claseActual = null;
+    this.proximaClase = null;
+
+    for (const c of this.cursosSenati) {
+      const hStr = (c.horario || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (!hStr) continue;
+
+      // Verificar si coincide con el día de hoy
+      const coincideDia = hStr.includes(diaHoyAbbr) || hStr.includes(diaHoyAlt) || 
+        (!hStr.includes('lun') && !hStr.includes('mar') && !hStr.includes('mie') && !hStr.includes('jue') && !hStr.includes('vie') && !hStr.includes('sab') && diaIndex >= 1 && diaIndex <= 5);
+
+      if (coincideDia) {
+        const timeMatches = hStr.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/g);
+        let inicioMin = 0;
+        let finMin = 24 * 60;
+        let horaFormateada = c.horario;
+
+        if (timeMatches && timeMatches.length >= 1) {
+          const [hIni, mIni] = timeMatches[0].split(':').map(Number);
+          inicioMin = hIni * 60 + mIni;
+
+          if (timeMatches.length >= 2) {
+            const [hFin, mFin] = timeMatches[1].split(':').map(Number);
+            finMin = hFin * 60 + mFin;
+            horaFormateada = `${timeMatches[0]} - ${timeMatches[1]}`;
+          } else {
+            finMin = inicioMin + 180;
+            horaFormateada = `${timeMatches[0]} (Aprox. 3h)`;
+          }
+        }
+
+        const claseInfo = {
+          ...c,
+          horaFormateada,
+          inicioMin,
+          finMin
+        };
+
+        this.clasesHoy.push(claseInfo);
+
+        if (horaActualMinutos >= inicioMin && horaActualMinutos <= finMin) {
+          this.claseActual = claseInfo;
+        } else if (horaActualMinutos < inicioMin) {
+          if (!this.proximaClase || inicioMin < this.proximaClase.inicioMin) {
+            this.proximaClase = claseInfo;
+          }
+        }
+      }
+    }
+  }
+
+  // --- GITHUB WIDGET DEV ---
+  async loadGithubData() {
+    if (!this.githubUsername) return;
+    this.loadingGithub = true;
+    this.githubError = '';
+    try {
+      const headers: Record<string, string> = {
+        'Accept': 'application/vnd.github.v3+json'
+      };
+      if (this.githubToken) {
+        headers['Authorization'] = `Bearer ${this.githubToken.trim()}`;
+      }
+
+      // Si hay token, consultar endpoint autenticado /user, de lo contrario consultar /users/:username
+      const userUrl = this.githubToken
+        ? 'https://api.github.com/user'
+        : `https://api.github.com/users/${encodeURIComponent(this.githubUsername)}`;
+
+      const resUser = await fetch(userUrl, { headers });
+      if (resUser.ok) {
+        this.githubUser = await resUser.json();
+        if (this.githubToken && this.githubUser?.login) {
+          this.githubUsername = this.githubUser.login;
+          localStorage.setItem('central_github_user', this.githubUser.login);
+        }
+      } else {
+        this.githubUser = null;
+        this.githubError = resUser.status === 401
+          ? 'Token de GitHub inválido o expirado.'
+          : 'Usuario de GitHub no encontrado.';
+      }
+
+      // Si hay token, consultar /user/repos para incluir repositorios privados
+      const reposUrl = this.githubToken
+        ? 'https://api.github.com/user/repos?sort=updated&per_page=50&affiliation=owner,collaborator'
+        : `https://api.github.com/users/${encodeURIComponent(this.githubUsername)}/repos?sort=updated&per_page=30`;
+
+      const resRepos = await fetch(reposUrl, { headers });
+      if (resRepos.ok) {
+        this.githubRepos = await resRepos.json();
+      } else {
+        this.githubRepos = [];
+      }
+    } catch (err: any) {
+      console.warn('Error consultando GitHub API:', err);
+      this.githubError = 'No se pudo conectar con GitHub API.';
+    } finally {
+      this.loadingGithub = false;
+      this.refreshView();
+    }
+  }
+
+  iniciarEdicionGithub() {
+    this.githubInput = this.githubUsername;
+    this.githubTokenInput = this.githubToken;
+    this.editingGithubUser = true;
+  }
+
+  cancelarEdicionGithub() {
+    this.editingGithubUser = false;
+  }
+
+  guardarGithubUser() {
+    const user = this.githubInput.trim();
+    const token = this.githubTokenInput.trim();
+
+    if (user) {
+      this.githubUsername = user;
+      localStorage.setItem('central_github_user', user);
+    }
+
+    this.githubToken = token;
+    if (token) {
+      localStorage.setItem('central_github_token', token);
+    } else {
+      localStorage.removeItem('central_github_token');
+    }
+
+    this.editingGithubUser = false;
+    this.loadGithubData();
+    this.showToast('Configuración de GitHub guardada');
+  }
+
+  getLangColor(lang: string): string {
+    const colors: { [key: string]: string } = {
+      TypeScript: '#3178c6',
+      JavaScript: '#f7df1e',
+      HTML: '#e34f26',
+      CSS: '#563d7c',
+      PHP: '#4F5D95',
+      Python: '#3572A5',
+      Java: '#b07219',
+      'C#': '#178600',
+      Shell: '#89e051'
+    };
+    return colors[lang] || '#94a3b8';
   }
 
   // --- SPOTLIGHT QUICK SEARCH ---
