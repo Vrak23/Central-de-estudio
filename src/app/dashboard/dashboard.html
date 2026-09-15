@@ -137,6 +137,26 @@
         <kbd class="spotlight-kbd">Ctrl K</kbd>
       </button>
 
+      <!-- BOTÓN VÍNCULO MICROSOFT 365 SENATI -->
+      <button 
+        (click)="openM365Modal()" 
+        class="m365-header-btn" 
+        [class.connected]="m365Service.isConnected()" 
+        title="Conexión Microsoft 365 SENATI (Teams & Outlook)">
+        <span class="m365-icon-badge">
+          <svg width="13" height="13" viewBox="0 0 21 21" fill="none">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+          </svg>
+        </span>
+        <span class="m365-btn-label">M365</span>
+        <span class="m365-status-pill" [class.active]="m365Service.isConnected()">
+          {{ m365Service.isConnected() ? 'Conectado' : 'Conectar' }}
+        </span>
+      </button>
+
       <!-- BOTÓN APPS DROPDOWN -->
       <details class="hamburger-menu apps-dropdown">
         <summary class="apps-button" title="Ecosistema de Apps">
@@ -197,6 +217,22 @@
             </div>
           </div>
 
+          <!-- BOTÓN MICROSOFT 365 EN HAMBURGUESA -->
+          <button (click)="openM365Modal(); cerrarDropdowns()" class="menu-link-btn" title="Vincular cuenta Microsoft 365 SENATI">
+            <div style="display:flex; align-items:center; gap:0.45rem;">
+              <svg width="14" height="14" viewBox="0 0 21 21" fill="none" style="flex-shrink:0;">
+                <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+                <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+                <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+              </svg>
+              <span>Microsoft 365 SENATI</span>
+            </div>
+            <span class="menu-badge-count" [style.background]="m365Service.isConnected() ? '#10b981' : '#64748b'">
+              {{ m365Service.isConnected() ? '✓' : '+' }}
+            </span>
+          </button>
+
           <!-- BOTÓN TAREAS SENATI EN HAMBURGUESA -->
           <button (click)="abrirSenatiDrawer()" class="menu-link-btn" title="Ver tareas pendientes de SENATI">
             <div style="display:flex; align-items:center; gap:0.45rem;">
@@ -242,6 +278,9 @@
             <span class="today-badge-label">
               {{ claseActual ? 'Clase En Vivo' : (proximaClase ? 'Próxima Clase Hoy' : (clasesHoy.length > 0 ? 'Clases de Hoy' : 'Hoy Libre')) }}
             </span>
+            <span *ngIf="(claseActual || proximaClase)?.esTeamsReal" class="today-teams-live-badge">
+              🔵 Teams
+            </span>
             <span class="today-time-badge" *ngIf="claseActual || proximaClase">
               🕒 {{ (claseActual || proximaClase)?.horaFormateada }}
             </span>
@@ -253,6 +292,9 @@
             </div>
             <div class="today-course-prof" *ngIf="(claseActual || proximaClase)?.profesor">
               Docente: {{ (claseActual || proximaClase)?.profesor }}
+            </div>
+            <div *ngIf="!claseActual && !proximaClase && !m365Service.isConnected()" class="today-m365-invite" (click)="openM365Modal()" title="Vincular Microsoft 365 SENATI">
+              <span class="m365-sparkle">✨</span> Vincula tu Outlook SENATI para sincronizar Teams
             </div>
           </div>
 
@@ -562,6 +604,107 @@
     <div class="modal-actions">
       <button class="btn-guardar" (click)="agregarSitio()">{{ sitioEnEdicion ? 'Guardar cambios' : 'Guardar' }}</button>
       <button class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- MODAL MICROSOFT 365 & TEAMS SENATI                   -->
+<!-- ==================================================== -->
+<div *ngIf="modalM365Open" id="m365-overlay" class="backdrop-fade-in" (click)="closeM365Modal()">
+  <div class="m365-modal-box" (click)="$event.stopPropagation()">
+    <div class="m365-modal-header">
+      <div class="m365-modal-title-row">
+        <svg width="22" height="22" viewBox="0 0 21 21" fill="none">
+          <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+          <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+          <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+          <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+        <h3>Microsoft 365 & Teams SENATI</h3>
+      </div>
+      <button class="m365-modal-close" (click)="closeM365Modal()" title="Cerrar">✕</button>
+    </div>
+
+    <div class="m365-modal-body">
+      <!-- Estado de Conexión -->
+      <div class="m365-status-banner" [class.connected]="m365Service.isConnected()">
+        <span class="status-dot"></span>
+        <div class="status-text">
+          <strong>{{ m365Service.isConnected() ? 'Cuenta Institucional Conectada' : 'Cuenta No Vinculada' }}</strong>
+          <p>{{ m365Service.isConnected() ? 'Sincronizando clases y sesiones de Teams automáticamente.' : 'Conecta tu calendario de Outlook SENATI para ver tus clases en vivo.' }}</p>
+        </div>
+      </div>
+
+      <!-- Guía de Configuración Rápida -->
+      <div class="m365-instructions-card">
+        <h4>📋 ¿Cómo obtener tu enlace de Outlook SENATI? (Sin permisos de TI)</h4>
+        <ol class="m365-steps-list">
+          <li>Abre tu <a href="https://outlook.cloud.microsoft/calendar" target="_blank" class="m365-ext-link">Outlook SENATI Web ↗</a> con tu cuenta <code>@senati.pe</code>.</li>
+          <li>Haz clic en el ícono de <strong>Configuración ⚙️</strong> (arriba a la derecha).</li>
+          <li>Ve a <strong>Calendario</strong> &gt; <strong>Calendarios compartidos</strong>.</li>
+          <li>En la sección <strong>"Publicar un calendario"</strong>, selecciona tu Calendario, elige <em>"Puede ver todos los detalles"</em> y haz clic en <strong>Publicar</strong>.</li>
+          <li>Copia el enlace <strong>ICS</strong> (o HTML/Webcal) y pégalo abajo.</li>
+        </ol>
+      </div>
+
+      <!-- Campos de configuración -->
+      <div class="m365-form-group">
+        <label for="m365-name">Nombre de Alumno</label>
+        <input 
+          id="m365-name" 
+          type="text" 
+          [(ngModel)]="m365InputName" 
+          placeholder="Ej: Rodrigo Llanos" 
+          class="m365-input"
+        />
+      </div>
+
+      <div class="m365-form-group">
+        <label for="m365-email">Correo Institucional</label>
+        <input 
+          id="m365-email" 
+          type="email" 
+          [(ngModel)]="m365InputEmail" 
+          placeholder="ejemplo@senati.pe" 
+          class="m365-input"
+        />
+      </div>
+
+      <div class="m365-form-group">
+        <label for="m365-feed">Enlace de Calendario Outlook (.ics / webcal)</label>
+        <input 
+          id="m365-feed" 
+          type="text" 
+          [(ngModel)]="m365FeedUrl" 
+          placeholder="https://outlook.office365.com/owa/calendar/.../reachcalendar.ics" 
+          class="m365-input"
+        />
+        <span class="m365-field-hint">Este enlace permite leer tus clases del día y enlaces de Teams sin almacenar contraseñas.</span>
+      </div>
+
+      <!-- Preview de clases detectadas si ya sincronizó -->
+      <div *ngIf="teamsEventsToday.length > 0" class="m365-events-preview">
+        <h5>Clases detectadas hoy en Teams ({{ teamsEventsToday.length }}):</h5>
+        <ul>
+          <li *ngFor="let ev of teamsEventsToday">
+            <span class="teams-preview-title">{{ ev.titulo }}</span>
+            <span class="teams-preview-time">{{ ev.horaFormateada }}</span>
+            <a *ngIf="ev.joinTeamsUrl" [href]="ev.joinTeamsUrl" target="_blank" class="teams-pill">Link Teams ↗</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="m365-modal-footer">
+      <button *ngIf="m365Service.isConnected()" class="btn-m365-danger" (click)="disconnectM365()" type="button">
+        Desvincular
+      </button>
+      <div style="flex:1;"></div>
+      <button class="btn-m365-secondary" (click)="closeM365Modal()" type="button">Cancelar</button>
+      <button class="btn-m365-primary" (click)="saveM365Config()" [disabled]="isSyncingM365" type="button">
+        {{ isSyncingM365 ? 'Sincronizando...' : 'Guardar y Sincronizar' }}
+      </button>
     </div>
   </div>
 </div>

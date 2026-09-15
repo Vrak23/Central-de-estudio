@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../services/supabase';
+import { MicrosoftSenatiService, TeamsClassEvent, M365UserProfile } from '../services/microsoft-senati.service';
 
 export interface DevComando {
   tech: string;
@@ -259,8 +260,18 @@ export class Dashboard implements OnInit, OnDestroy {
   senatiPortalUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:4201' : 'https://senati-portal.vercel.app/';
   bitacoraUrl = 'https://bitacora-senati.vercel.app/';
 
+  // --- MICROSOFT 365 SENATI ---
+  m365Profile: M365UserProfile | null = null;
+  m365FeedUrl = '';
+  modalM365Open = false;
+  isSyncingM365 = false;
+  teamsEventsToday: TeamsClassEvent[] = [];
+  m365InputName = '';
+  m365InputEmail = '';
+
   constructor(
     private supabaseService: SupabaseService,
+    public m365Service: MicrosoftSenatiService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -353,6 +364,7 @@ export class Dashboard implements OnInit, OnDestroy {
     await this.loadTareasSenati();
     await this.loadCursosSenati();
     await this.loadGithubData();
+    await this.loadM365Events();
     this.refreshView();
   }
 
@@ -531,6 +543,89 @@ export class Dashboard implements OnInit, OnDestroy {
         }
       }
     }
+
+    // Integración prioritaria con Microsoft Teams en vivo (M365 SENATI)
+    if (this.teamsEventsToday.length > 0) {
+      for (const tEvent of this.teamsEventsToday) {
+        const hIni = tEvent.inicio.getHours() * 60 + tEvent.inicio.getMinutes();
+        const hFin = tEvent.fin.getHours() * 60 + tEvent.fin.getMinutes();
+
+        const claseTeams = {
+          nombre: tEvent.titulo,
+          profesor: tEvent.docente || 'Docente SENATI (Teams)',
+          horaFormateada: tEvent.horaFormateada,
+          inicioMin: hIni,
+          finMin: hFin,
+          link_teams: tEvent.joinTeamsUrl,
+          link_blackboard: 'https://senati.blackboard.com/',
+          esTeamsReal: true
+        };
+
+        this.clasesHoy.unshift(claseTeams);
+
+        if (tEvent.isLiveNow) {
+          this.claseActual = claseTeams;
+        } else if (tEvent.isUpcomingToday) {
+          if (!this.proximaClase || hIni < this.proximaClase.inicioMin) {
+            this.proximaClase = claseTeams;
+          }
+        }
+      }
+    }
+  }
+
+  // --- MICROSOFT 365 SENATI METHODS ---
+  async loadM365Events() {
+    this.m365Profile = this.m365Service.getProfile();
+    this.m365FeedUrl = this.m365Service.getCalendarFeedUrl();
+    if (this.m365FeedUrl) {
+      this.isSyncingM365 = true;
+      try {
+        this.teamsEventsToday = await this.m365Service.getTodayEventsFromFeed();
+        this.analizarHorarioSenati();
+      } catch (e) {
+        console.warn('Error cargando eventos Teams M365:', e);
+      } finally {
+        this.isSyncingM365 = false;
+        this.refreshView();
+      }
+    }
+  }
+
+  openM365Modal() {
+    this.modalM365Open = true;
+    this.m365FeedUrl = this.m365Service.getCalendarFeedUrl();
+    this.m365Profile = this.m365Service.getProfile();
+    this.m365InputName = this.m365Profile?.displayName || `${this.userName} ${this.userLastName}`.trim();
+    this.m365InputEmail = this.m365Profile?.email || 'alumno@senati.pe';
+    this.refreshView();
+  }
+
+  closeM365Modal() {
+    this.modalM365Open = false;
+    this.refreshView();
+  }
+
+  async saveM365Config() {
+    if (this.m365FeedUrl.trim()) {
+      this.m365Service.saveCalendarFeedUrl(this.m365FeedUrl);
+    }
+    if (this.m365InputEmail.trim()) {
+      this.m365Service.setManualProfile(this.m365InputName, this.m365InputEmail);
+    }
+    this.showToast('Cuenta Microsoft SENATI vinculada');
+    await this.loadM365Events();
+    this.closeM365Modal();
+  }
+
+  disconnectM365() {
+    this.m365Service.disconnect();
+    this.m365Profile = null;
+    this.m365FeedUrl = '';
+    this.teamsEventsToday = [];
+    this.analizarHorarioSenati();
+    this.showToast('Cuenta Microsoft desvinculada');
+    this.closeM365Modal();
   }
 
   // --- GITHUB WIDGET DEV ---
