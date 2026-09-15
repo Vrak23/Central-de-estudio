@@ -1566,8 +1566,48 @@ header {
     display: none;
   }
 
-  .hero-desktop-trigger-box {
+  .m365-header-btn {
     display: none;
+  }
+
+  .command-hero {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .greeting-box {
+    width: 100%;
+  }
+
+  .hero-desktop-trigger-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: 100%;
+  }
+
+  .today-class-card {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .today-actions-row {
+    width: 100%;
+  }
+
+  .today-actions-row .btn-today-action {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .senati-square-btn {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
   }
 
   .hero-title {
@@ -1653,6 +1693,28 @@ header {
   .cmd-code-line {
     font-size: 0.7rem;
   }
+
+  .apps-panel {
+    right: 0;
+    width: min(90vw, 260px);
+  }
+
+  .m365-header-btn .m365-status-pill {
+    display: none;
+  }
+
+  .today-class-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .today-course-name {
+    font-size: 0.88rem;
+  }
+
+  .today-m365-invite {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.5rem;
+  }
 }
 
 /* ==================================================== */
@@ -1671,6 +1733,7 @@ header {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(12px);
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .today-class-card.live {
@@ -1681,7 +1744,8 @@ header {
 .today-card-badge-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  flex-wrap: wrap;
 }
 
 .live-dot {
@@ -2610,4 +2674,125 @@ header {
   background: rgba(239, 68, 68, 0.15);
   border-color: #ef4444;
 }
+
+/* =================================================== */
+/* RESPONSIVE M365 & ELEMENTOS MÓVILES (<640px, <480px)*/
+/* =================================================== */
+@media (max-width: 640px) {
+  #m365-overlay {
+    padding: 0.5rem;
+  }
+
+  .m365-modal-box {
+    width: 100%;
+    max-height: 94vh;
+    border-radius: 12px;
+  }
+
+  .m365-modal-header {
+    padding: 0.85rem 1rem;
+  }
+
+  .m365-modal-title-row h3 {
+    font-size: 0.95rem;
+  }
+
+  .m365-modal-body {
+    padding: 0.85rem 1rem;
+    gap: 0.85rem;
+  }
+
+  .m365-instructions-card {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .m365-steps-list {
+    padding-left: 1.15rem;
+    font-size: 0.74rem;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .m365-steps-list code {
+    word-break: break-all;
+  }
+
+  .m365-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .m365-modal-footer {
+    padding: 0.8rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .m365-events-preview li {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .m365-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .m365-modal-footer > div {
+    display: none;
+  }
+
+  .btn-m365-primary,
+  .btn-m365-secondary,
+  .btn-m365-danger {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 0.55rem;
+    font-size: 0.8rem;
+  }
+
+  .today-teams-live-badge {
+    font-size: 0.62rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .today-actions-row {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .btn-today-action {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .github-heading-right {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .btn-gh-toggle-mini,
+  .btn-gh-config,
+  .add-btn {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .header-content {
+    gap: 0.3rem;
+  }
+
+  .brand-title {
+    font-size: 0.82rem;
+  }
+}
+
+
 
