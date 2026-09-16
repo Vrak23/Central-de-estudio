@@ -40,8 +40,8 @@ export class Dashboard implements OnInit, OnDestroy {
   // Portales y Sitios
   sitios: any[] = [];
   
-  // Portales Fijos con Logos Oficiales Locales
-  portalesFijos: PortalFijo[] = [
+  // Portales Fijos Base con Logos Oficiales Locales
+  defaultPortalesFijos: PortalFijo[] = [
     {
       id: 'bb',
       nombre: 'Blackboard SENATI',
@@ -99,6 +99,9 @@ export class Dashboard implements OnInit, OnDestroy {
       descripcion: 'Apuntes, gestión y documentación.'
     }
   ];
+
+  // Portales Fijos activos (con posibles logos personalizados por el usuario)
+  portalesFijos: PortalFijo[] = [];
 
   // Catálogo Completo de Chuletas Dev (Ordenados por Flujo de Trabajo Natural)
   comandosDev: DevComando[] = [
@@ -200,6 +203,7 @@ export class Dashboard implements OnInit, OnDestroy {
   modalAddSitioOpen = false;
 
   sitioEnEdicion: any = null;
+  portalFijoEnEdicion: PortalFijo | null = null;
   newSitio = {
     nombre: '',
     url: '',
@@ -341,6 +345,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.updateDateTime();
+    this.loadPortalesFijos();
     this.clockInterval = setInterval(() => {
       this.updateDateTime();
       this.analizarHorarioSenati();
@@ -752,17 +757,66 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   // --- PORTALES & SITIOS ---
+  loadPortalesFijos() {
+    try {
+      const saved = localStorage.getItem('central_fixed_portals_custom');
+      if (saved) {
+        const customOverrides = JSON.parse(saved);
+        this.portalesFijos = this.defaultPortalesFijos.map(p => {
+          if (customOverrides[p.id]) {
+            return { ...p, ...customOverrides[p.id] };
+          }
+          return { ...p };
+        });
+        return;
+      }
+    } catch (e) {
+      console.warn('Error reading portal overrides', e);
+    }
+    this.portalesFijos = [...this.defaultPortalesFijos];
+  }
+
+  actualizarPortalFijo(id: string, updates: Partial<PortalFijo>) {
+    try {
+      const saved = localStorage.getItem('central_fixed_portals_custom');
+      let customOverrides: Record<string, Partial<PortalFijo>> = saved ? JSON.parse(saved) : {};
+      customOverrides[id] = { ...customOverrides[id], ...updates };
+      localStorage.setItem('central_fixed_portals_custom', JSON.stringify(customOverrides));
+    } catch (e) {
+      console.warn('Error saving portal override', e);
+    }
+    this.loadPortalesFijos();
+  }
+
+  restaurarPortalFijo(id: string) {
+    try {
+      const saved = localStorage.getItem('central_fixed_portals_custom');
+      if (saved) {
+        const customOverrides = JSON.parse(saved);
+        delete customOverrides[id];
+        localStorage.setItem('central_fixed_portals_custom', JSON.stringify(customOverrides));
+      }
+    } catch (e) {}
+    this.loadPortalesFijos();
+    this.showToast('Portal restaurado a su logo original');
+  }
+
   async loadSitios() {
     this.sitios = await this.supabaseService.getSitios();
     this.refreshView();
   }
 
   get sitiosPersonales() {
-    return this.sitios.filter(s => s.categoria === 'personal');
+    return this.sitios.filter(s => s.categoria === 'personal' || !s.categoria);
+  }
+
+  get sitiosFijosCustom() {
+    return this.sitios.filter(s => s.categoria === 'fijo');
   }
 
   abrirModal() {
     this.sitioEnEdicion = null;
+    this.portalFijoEnEdicion = null;
     this.newSitio = { nombre: '', url: '', icono: '', descripcion: '', categoria: 'personal' };
     this.modalAddSitioOpen = true;
     this.formError = '';
@@ -773,6 +827,7 @@ export class Dashboard implements OnInit, OnDestroy {
       event.stopPropagation();
       event.preventDefault();
     }
+    this.portalFijoEnEdicion = null;
     this.sitioEnEdicion = sitio;
     this.newSitio = {
       nombre: sitio.nombre || '',
@@ -785,15 +840,140 @@ export class Dashboard implements OnInit, OnDestroy {
     this.formError = '';
   }
 
+  abrirModalEditarPortal(portal: PortalFijo, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.sitioEnEdicion = null;
+    this.portalFijoEnEdicion = portal;
+    this.newSitio = {
+      nombre: portal.nombre || '',
+      url: portal.url || '',
+      icono: portal.icono || '',
+      descripcion: portal.descripcion || '',
+      categoria: 'fijo'
+    };
+    this.modalAddSitioOpen = true;
+    this.formError = '';
+  }
+
   cerrarModal() {
     this.modalAddSitioOpen = false;
     this.sitioEnEdicion = null;
+    this.portalFijoEnEdicion = null;
     this.newSitio = { nombre: '', url: '', icono: '', descripcion: '', categoria: 'personal' };
     this.formError = '';
   }
 
+  onLogoFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    if (!file.type.startsWith('image/')) {
+      this.formError = 'Por favor selecciona un archivo de imagen válido (PNG, JPG, SVG, WebP, ICO, GIF).';
+      input.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.formError = 'La imagen no debe superar los 5MB.';
+      input.value = '';
+      return;
+    }
+
+    this.formError = '';
+
+    // Si es SVG, leer directamente como Data URL
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.newSitio.icono = reader.result as string;
+        input.value = '';
+        this.refreshView();
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    // Imagen raster (PNG, JPG, WebP, etc.): optimizar/redimensionar a 256x256 max para rapidez y ligereza
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 256;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          this.newSitio.icono = canvas.toDataURL('image/png');
+        } else {
+          this.newSitio.icono = e.target.result;
+        }
+        input.value = '';
+        this.refreshView();
+      };
+      img.onerror = () => {
+        this.formError = 'Error al procesar la imagen seleccionada.';
+        input.value = '';
+        this.refreshView();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  detectarFaviconAuto() {
+    let url = this.newSitio.url.trim();
+    if (!url) {
+      this.formError = 'Ingresa primero la URL del sitio para detectar su logo.';
+      return;
+    }
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
+    try {
+      const parsed = new URL(url);
+      const domain = parsed.hostname;
+      this.newSitio.icono = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+      this.formError = '';
+      this.showToast('Logo obtenido del dominio 🌐');
+      this.refreshView();
+    } catch {
+      this.formError = 'URL no válida para obtener el logo.';
+    }
+  }
+
+  limpiarLogo() {
+    this.newSitio.icono = '';
+    this.refreshView();
+  }
+
+  restaurarLogoOriginalPortal() {
+    if (!this.portalFijoEnEdicion) return;
+    const original = this.defaultPortalesFijos.find(p => p.id === this.portalFijoEnEdicion?.id);
+    if (original) {
+      this.newSitio.icono = original.icono;
+      this.refreshView();
+    }
+  }
+
   resolverIcono(url: string, iconoIngresado: string): string {
-    if (iconoIngresado.trim()) return iconoIngresado.trim();
+    if (iconoIngresado && iconoIngresado.trim()) return iconoIngresado.trim();
 
     const dominios = [
       { match: 'youtube.com',       favicon: 'youtube.com' },
@@ -805,11 +985,16 @@ export class Dashboard implements OnInit, OnDestroy {
 
     for (const d of dominios) {
       if (url.includes(d.match)) {
-        return `https://www.google.com/s2/favicons?sz=64&domain=${d.favicon}`;
+        return `https://www.google.com/s2/favicons?sz=128&domain=${d.favicon}`;
       }
     }
 
-    return '🌐';
+    try {
+      const parsed = new URL(url);
+      return `https://www.google.com/s2/favicons?sz=128&domain=${parsed.hostname}`;
+    } catch {
+      return '🌐';
+    }
   }
 
   async agregarSitio() {
@@ -831,14 +1016,23 @@ export class Dashboard implements OnInit, OnDestroy {
     this.formError = '';
 
     try {
-      if (this.sitioEnEdicion) {
+      if (this.portalFijoEnEdicion) {
+        this.actualizarPortalFijo(this.portalFijoEnEdicion.id, {
+          nombre,
+          url,
+          icono: iconoFinal,
+          descripcion
+        });
+        this.showToast('¡Portal fijo actualizado! ✨');
+        this.portalFijoEnEdicion = null;
+      } else if (this.sitioEnEdicion) {
         await this.supabaseService.updateSitio(this.sitioEnEdicion.id, nombre, url, iconoFinal, categoria, descripcion);
         await this.loadSitios();
-        this.showToast('¡Sitio actualizado con éxito!');
+        this.showToast('¡Sitio actualizado con éxito! ✨');
       } else {
         await this.supabaseService.addSitio(nombre, url, iconoFinal, categoria, descripcion);
         await this.loadSitios();
-        this.showToast('¡Sitio agregado con éxito!');
+        this.showToast('¡Sitio agregado con éxito! 🚀');
       }
       this.cerrarModal();
       this.refreshView();

@@ -304,15 +304,43 @@
       <!-- Grid Unificado y Espacioso de Portales -->
       <div class="grid">
         <!-- Portales Fijos -->
-        <a *ngFor="let portal of portalesFijos" [href]="portal.url" target="_blank" class="card">
-          <div class="card-logo">
-            <img [src]="portal.icono" [alt]="portal.nombre" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'">
+        <div *ngFor="let portal of portalesFijos" class="card card-custom" [id]="'portal-' + portal.id">
+          <div class="card-custom-actions">
+            <button class="btn-card-action btn-editar" (click)="abrirModalEditarPortal(portal, $event)" title="Cambiar logo o editar portal">✎</button>
           </div>
-          <div class="card-info">
-            <div class="card-title">{{ portal.nombre }}</div>
-            <p>{{ portal.descripcion }}</p>
+          <a [href]="portal.url" target="_blank" class="card-link">
+            <div class="card-logo-dyn">
+              <img *ngIf="isImageUrl(portal.icono); else showFixedEmoji" [src]="portal.icono" [alt]="portal.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'">
+              <ng-template #showFixedEmoji>
+                <span class="dyn-icon-emoji">{{ portal.icono }}</span>
+              </ng-template>
+            </div>
+            <div class="card-info">
+              <div class="card-title">{{ portal.nombre }}</div>
+              <p>{{ portal.descripcion }}</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Sitios Extras / Fijos desde Supabase -->
+        <div *ngFor="let sitio of sitiosFijosCustom" class="card card-custom" [id]="'sitio-' + sitio.id">
+          <div class="card-custom-actions">
+            <button class="btn-card-action btn-editar" (click)="abrirModalEditar(sitio, $event)" title="Editar portal">✎</button>
+            <button class="btn-card-action btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar portal">✕</button>
           </div>
-        </a>
+          <a [href]="sitio.url" target="_blank" class="card-link">
+            <div class="card-logo-dyn">
+              <img *ngIf="isImageUrl(sitio.icono); else showEmojiFijo" [src]="sitio.icono" [alt]="sitio.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
+              <ng-template #showEmojiFijo>
+                <span class="dyn-icon-emoji">{{ sitio.icono }}</span>
+              </ng-template>
+            </div>
+            <div class="card-info">
+              <div class="card-title">{{ sitio.nombre }}</div>
+              <p class="card-url">{{ sitio.descripcion || sitio.url }}</p>
+            </div>
+          </a>
+        </div>
 
         <!-- Sitios Personales -->
         <div *ngFor="let sitio of sitiosPersonales" class="card card-custom" [id]="'sitio-' + sitio.id">
@@ -322,7 +350,7 @@
           </div>
           <a [href]="sitio.url" target="_blank" class="card-link">
             <div class="card-logo-dyn">
-              <img *ngIf="isImageUrl(sitio.icono); else showEmoji" [src]="sitio.icono" alt="Icono" class="dyn-icon-img" />
+              <img *ngIf="isImageUrl(sitio.icono); else showEmoji" [src]="sitio.icono" [alt]="sitio.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
               <ng-template #showEmoji>
                 <span class="dyn-icon-emoji">{{ sitio.icono }}</span>
               </ng-template>
@@ -525,42 +553,87 @@
 </div>
 
 <!-- ==================================================== -->
-<!-- MODAL AGREGAR SITIO                                  -->
+<!-- MODAL AGREGAR / EDITAR SITIO O PORTAL               -->
 <!-- ==================================================== -->
 <div *ngIf="modalAddSitioOpen" id="modal-overlay" class="backdrop-fade-in" (click)="cerrarModal()">
   <div id="modal-box" (click)="$event.stopPropagation()">
-    <h3>{{ sitioEnEdicion ? 'Editar sitio' : 'Agregar nuevo sitio' }}</h3>
+    <div class="modal-top-bar">
+      <h3>{{ portalFijoEnEdicion ? 'Editar Portal Fijo' : (sitioEnEdicion ? 'Editar Sitio' : 'Agregar Nuevo Sitio') }}</h3>
+      <button class="modal-close-icon-btn" (click)="cerrarModal()" title="Cerrar">✕</button>
+    </div>
 
-    <div class="modal-field">
+    <!-- SECCIÓN DE LOGO / IMAGEN -->
+    <div class="modal-field logo-custom-section">
+      <label class="modal-label-strong">Logo del Sitio / Portal</label>
+      <div class="logo-custom-row">
+        <!-- Preview Box -->
+        <div class="logo-preview-box">
+          <img *ngIf="isImageUrl(newSitio.icono); else previewEmoji" [src]="newSitio.icono" alt="Vista previa logo" class="logo-preview-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
+          <ng-template #previewEmoji>
+            <span class="logo-preview-emoji">{{ newSitio.icono || '🌐' }}</span>
+          </ng-template>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="logo-action-buttons">
+          <input type="file" #fileLogoInput (change)="onLogoFileSelected($event)" accept="image/png, image/jpeg, image/webp, image/svg+xml, image/gif, image/x-icon, .png, .jpg, .jpeg, .webp, .svg, .ico, .gif" style="display:none" />
+          
+          <button type="button" class="btn-subir-logo" (click)="fileLogoInput.click()">
+            <span>📁</span> Subir imagen / logo
+          </button>
+
+          <div class="logo-sub-actions">
+            <button type="button" class="btn-logo-sub" (click)="detectarFaviconAuto()" title="Detectar favicon desde la URL">
+              ⚡ Detectar favicon
+            </button>
+            <button type="button" class="btn-logo-sub btn-logo-danger" *ngIf="newSitio.icono" (click)="limpiarLogo()" title="Quitar logo">
+              ✕ Quitar
+            </button>
+            <button type="button" class="btn-logo-sub" *ngIf="portalFijoEnEdicion" (click)="restaurarLogoOriginalPortal()" title="Restaurar logo original del portal">
+              ↺ Original
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input manual opcional de URL o Emoji -->
+      <div class="manual-logo-input-wrap">
+        <label for="input-icono" class="sub-label-dim">O ingresa URL o Emoji manualmente:</label>
+        <input type="text" id="input-icono" [(ngModel)]="newSitio.icono" placeholder="Ej: 🌐 o https://misitio.com/logo.png" class="input-subtle-logo" />
+      </div>
+    </div>
+
+    <div class="modal-field" *ngIf="!portalFijoEnEdicion">
       <label for="input-categoria">Categoría</label>
       <select id="input-categoria" [(ngModel)]="newSitio.categoria">
-        <option value="personal">Mis Sitios</option>
+        <option value="personal">Mis Sitios Personales</option>
         <option value="fijo">Portales Fijos</option>
       </select>
     </div>
-    <div class="modal-field">
-      <label for="input-icono">Ícono (emoji o URL)</label>
-      <input type="text" id="input-icono" [(ngModel)]="newSitio.icono" placeholder="🌐 o URL del icono" />
-    </div>
+
     <div class="modal-field">
       <label for="input-nombre">Nombre</label>
-      <input type="text" id="input-nombre" [(ngModel)]="newSitio.nombre" placeholder="Ej: Moodle" />
+      <input type="text" id="input-nombre" [(ngModel)]="newSitio.nombre" placeholder="Ej: Moodle, ChatGPT, etc." />
     </div>
+
     <div class="modal-field">
       <label for="input-url">URL</label>
       <input type="text" id="input-url" [(ngModel)]="newSitio.url" placeholder="Ej: https://moodle.senati.edu.pe" />
     </div>
+
     <div class="modal-field">
       <label for="input-descripcion">Descripción (opcional)</label>
       <input type="text" id="input-descripcion" [(ngModel)]="newSitio.descripcion" placeholder="Ej: Material de estudio y clases" />
     </div>
 
-    <p *ngIf="formError" id="form-error" style="color:#ef4444; font-size:0.8rem; margin-top:0.4rem;">
+    <p *ngIf="formError" id="form-error" class="form-error-text">
       {{ formError }}
     </p>
 
     <div class="modal-actions">
-      <button class="btn-guardar" (click)="agregarSitio()">{{ sitioEnEdicion ? 'Guardar cambios' : 'Guardar' }}</button>
+      <button class="btn-guardar" (click)="agregarSitio()">
+        {{ (portalFijoEnEdicion || sitioEnEdicion) ? 'Guardar cambios' : 'Guardar sitio' }}
+      </button>
       <button class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
     </div>
   </div>
