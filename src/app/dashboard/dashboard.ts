@@ -343,7 +343,10 @@ export class Dashboard implements OnInit, OnDestroy {
     openDetails.forEach(details => details.removeAttribute('open'));
   }
 
+  loadingApp = true;
+
   async ngOnInit() {
+    this.loadingApp = true;
     this.updateDateTime();
     this.loadPortalesFijos();
     this.clockInterval = setInterval(() => {
@@ -352,13 +355,21 @@ export class Dashboard implements OnInit, OnDestroy {
       this.refreshView();
     }, 60000);
 
-    await this.loadUserProfile();
-    await this.loadSitios();
-    await this.loadNotas();
-    await this.loadTareasSenati();
-    await this.loadCursosSenati();
-    await this.loadGithubData();
-    this.refreshView();
+    try {
+      await Promise.allSettled([
+        this.loadUserProfile(),
+        this.loadSitios(),
+        this.loadNotas(),
+        this.loadTareasSenati(),
+        this.loadCursosSenati(),
+        this.loadGithubData()
+      ]);
+    } catch (err) {
+      console.error('Error al inicializar la aplicación:', err);
+    } finally {
+      this.loadingApp = false;
+      this.refreshView();
+    }
   }
 
   ngOnDestroy() {

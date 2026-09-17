@@ -1,4 +1,22 @@
 <!-- ==================================================== -->
+<!-- PANTALLA DE CARGA INICIAL (SPLASH SCREEN)            -->
+<!-- ==================================================== -->
+<div *ngIf="loadingApp" class="app-splash-screen">
+  <div class="splash-card">
+    <div class="splash-logo-wrap">
+      <div class="splash-glow-ring"></div>
+      <div class="splash-brand-badge">CH</div>
+    </div>
+    <div class="splash-spinner-ring"></div>
+    <h2 class="splash-title">CENTRAL HUB</h2>
+    <p class="splash-status-text">Cargando tu cuenta y sincronizando entorno...</p>
+    <div class="splash-bar-track">
+      <div class="splash-bar-fill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== -->
 <!-- PANEL DESLIZANTE DE TAREAS SENATI (SLIDE A LA IZQ)   -->
 <!-- ==================================================== -->
 <div 

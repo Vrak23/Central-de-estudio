@@ -11,6 +11,126 @@
   box-sizing: border-box;
 }
 
+/* =================================================== */
+/* PANTALLA DE CARGA INICIAL (FULLSCREEN SPLASH)       */
+/* =================================================== */
+.app-splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0b0b0f;
+  background: radial-gradient(circle at 50% 45%, #181824 0%, #09090d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.splash-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+}
+
+.splash-logo-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.splash-glow-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #f97316, #ea580c, #3b82f6, #f97316);
+  filter: blur(10px);
+  opacity: 0.75;
+  animation: splashSpin 3s linear infinite;
+}
+
+.splash-brand-badge {
+  position: relative;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  background: #12121a;
+  border: 1.5px solid rgba(249, 115, 22, 0.5);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f97316;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.splash-title {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.4rem 0;
+  text-transform: uppercase;
+}
+
+.splash-status-text {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.4;
+}
+
+.splash-bar-track {
+  width: 180px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.splash-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  border-radius: 999px;
+  animation: splashIndeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes splashSpin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes splashIndeterminate {
+  0% {
+    left: -50%;
+    width: 30%;
+  }
+  50% {
+    left: 25%;
+    width: 60%;
+  }
+  100% {
+    left: 100%;
+    width: 30%;
+  }
+}
+
 .main-container {
   flex: 1 0 auto;
   max-width: 1200px;
