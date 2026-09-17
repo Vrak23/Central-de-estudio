@@ -1,7 +1,7 @@
 <!-- ==================================================== -->
 <!-- PANTALLA DE CARGA INICIAL (SPLASH SCREEN)            -->
 <!-- ==================================================== -->
-<div *ngIf="loadingApp" class="app-splash-screen">
+<div class="app-splash-screen" [class.splash-hidden]="!loadingApp">
   <div class="splash-card">
     <div class="splash-logo-wrap">
       <div class="splash-glow-ring"></div>
