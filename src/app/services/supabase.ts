@@ -88,7 +88,7 @@ export class SupabaseService {
           usuario_id: user.id,
           nombre,
           url,
-          icono: icono || '🌐',
+          icono: icono || '',
           categoria,
           descripcion
         }
@@ -106,7 +106,7 @@ export class SupabaseService {
       .update({
         nombre,
         url,
-        icono: icono || '🌐',
+        icono: icono || '',
         categoria,
         descripcion
       })
