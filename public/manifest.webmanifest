@@ -1,0 +1,63 @@
+{
+  "name": "CENTRAL HUB",
+  "short_name": "CentralHub",
+  "description": "Centro de comando para estudiantes de Informática y Desarrollo Web de SENATI",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0f",
+  "theme_color": "#0e0e12",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Chuletas Dev",
+      "short_name": "Chuletas",
+      "description": "Comandos de servidores y desarrollo",
+      "url": "/?vista=chuletas",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Portales & Sitios",
+      "short_name": "Portales",
+      "description": "Accesos a plataformas y herramientas",
+      "url": "/?vista=sitios",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Blackboard SENATI",
+      "short_name": "Blackboard",
+      "description": "Aula virtual institucional",
+      "url": "https://senati.blackboard.com/",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bitácora SENATI",
+      "short_name": "Bitácora",
+      "description": "Informes semanales duales",
+      "url": "https://bitacora-senati.vercel.app/",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

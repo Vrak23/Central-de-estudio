@@ -331,6 +331,106 @@ export class Dashboard implements OnInit, OnDestroy {
     this.reposExpandidos = !this.reposExpandidos;
   }
 
+  // --- PWA & RECORDATORIOS DE CLASE ---
+  deferredInstallPrompt: any = null;
+  puedeInstalarPWA = false;
+  notificacionesHabilitadas = false;
+  private ultimaClaseNotificadaId: string | null = null;
+
+  @HostListener('window:beforeinstallprompt', ['$event'])
+  onBeforeInstallPrompt(event: any) {
+    event.preventDefault();
+    this.deferredInstallPrompt = event;
+    this.puedeInstalarPWA = true;
+    this.refreshView();
+  }
+
+  @HostListener('window:appinstalled')
+  onAppInstalled() {
+    this.puedeInstalarPWA = false;
+    this.deferredInstallPrompt = null;
+    this.showToast('¡Central Hub instalado en tu dispositivo! 🎉');
+    this.refreshView();
+  }
+
+  async instalarPWA() {
+    if (!this.deferredInstallPrompt) {
+      this.showToast('Para instalar, pulsa "Agregar a pantalla de inicio" o "Instalar app" en tu navegador.');
+      return;
+    }
+    this.deferredInstallPrompt.prompt();
+    const choice = await this.deferredInstallPrompt.userChoice;
+    if (choice && choice.outcome === 'accepted') {
+      this.showToast('Instalando Central Hub...');
+    }
+    this.deferredInstallPrompt = null;
+    this.puedeInstalarPWA = false;
+    this.refreshView();
+  }
+
+  verificarPermisoNotificaciones() {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      this.notificacionesHabilitadas = Notification.permission === 'granted';
+    }
+  }
+
+  async solicitarNotificaciones() {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      this.showToast('Tu navegador no soporta notificaciones');
+      return;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      this.notificacionesHabilitadas = permission === 'granted';
+      if (this.notificacionesHabilitadas) {
+        this.showToast('¡Recordatorios de clase activados! 🔔');
+        this.verificarRecordatorioProximaClase(true);
+      } else {
+        this.showToast('Permiso de notificaciones no habilitado');
+      }
+    } catch (e) {
+      console.warn('Error al solicitar notificaciones:', e);
+    }
+    this.refreshView();
+  }
+
+  verificarRecordatorioProximaClase(forzar = false) {
+    if (!this.notificacionesHabilitadas) return;
+    const clase = this.claseActual || this.proximaClase;
+    if (!clase) return;
+
+    const ahora = new Date();
+    const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
+    const difMinutos = clase.inicioMin - minutosAhora;
+
+    if (forzar || (difMinutos > 0 && difMinutos <= 15)) {
+      if (this.ultimaClaseNotificadaId !== clase.id || forzar) {
+        this.ultimaClaseNotificadaId = clase.id;
+        const titulo = this.claseActual ? '🔴 Clase en curso' : '⏰ Próxima clase pronto';
+        const cuerpo = forzar
+          ? `${clase.nombre} • ${clase.horaFormateada} (${clase.profesor || 'Docente asignado'})`
+          : `Tu clase de ${clase.nombre} inicia en ${difMinutos} minutos.`;
+
+        const targetUrl = clase.link_teams || clase.link_blackboard || window.location.origin;
+
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(titulo, {
+              body: cuerpo,
+              icon: '/icons/icon-192x192.png',
+              badge: '/icons/icon-192x192.png',
+              data: { url: targetUrl }
+            });
+          }).catch(() => {
+            new Notification(titulo, { body: cuerpo, icon: '/icons/icon-192x192.png' });
+          });
+        } else {
+          new Notification(titulo, { body: cuerpo, icon: '/icons/icon-192x192.png' });
+        }
+      }
+    }
+  }
+
   constructor(
     private supabaseService: SupabaseService,
     private router: Router,
@@ -409,9 +509,19 @@ export class Dashboard implements OnInit, OnDestroy {
       this.vistaActiva = savedVista;
     }
 
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const vistaParam = urlParams.get('vista') as VistaDashboard;
+      if (vistaParam && ['inicio', 'sitios', 'github', 'chuletas'].includes(vistaParam)) {
+        this.vistaActiva = vistaParam;
+      }
+      this.verificarPermisoNotificaciones();
+    }
+
     this.clockInterval = setInterval(() => {
       this.updateDateTime();
       this.analizarHorarioSenati();
+      this.verificarRecordatorioProximaClase();
       this.refreshView();
     }, 60000);
 

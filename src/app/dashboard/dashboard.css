@@ -335,6 +335,34 @@ header {
   font-size: 0.74rem;
 }
 
+.pwa-header-btn {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: #f97316;
+}
+
+.pwa-header-btn:hover {
+  background: rgba(249, 115, 22, 0.28);
+  color: #ffffff;
+}
+
+.pwa-install-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.18);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  margin-left: auto;
+}
+
+.pwa-install-badge.active-badge {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
 /* Avatar trigger en header */
 .avatar-menu-trigger {
   background: transparent;
