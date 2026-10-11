@@ -12,13 +12,46 @@ export interface DevComando {
   icono: string;
 }
 
+export type GrupoPortal = 'senati' | 'dev' | 'herramientas';
+export type VistaDashboard = 'inicio' | 'sitios' | 'github' | 'chuletas';
+
 export interface PortalFijo {
   id: string;
   nombre: string;
   url: string;
   icono: string;
   descripcion: string;
+  grupo?: GrupoPortal;
 }
+
+/** Item unificado para mostrar portales base y sitios guardados en Supabase. */
+export interface ItemPortal {
+  nombre: string;
+  url: string;
+  icono: string;
+  descripcion: string;
+  tipo: 'base' | 'db';
+  ref: any;
+}
+
+export interface GrupoPortales {
+  id: string;
+  titulo: string;
+  items: ItemPortal[];
+}
+
+/** Genera un ícono SVG como data URL (para apps sin logo propio). */
+const svgIcon = (paths: string, color: string): string =>
+  'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
+  );
+
+const SENATI_PORTAL_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  ? 'http://localhost:4201'
+  : 'https://senati-portal.vercel.app/';
+const BITACORA_URL = 'https://bitacora-senati.vercel.app/';
+
+const DIAS_NOMBRE = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 @Component({
   selector: 'app-dashboard',
@@ -34,69 +67,102 @@ export class Dashboard implements OnInit, OnDestroy {
   dateTimeString = '';
   saludo = 'Hola';
 
-  // Vista actual: 'dashboard' o 'chuletas'
-  vistaActiva: 'dashboard' | 'chuletas' = 'dashboard';
+  // Pestaña activa (persistida en localStorage)
+  vistaActiva: VistaDashboard = 'inicio';
+
+  readonly senatiPortalUrl = SENATI_PORTAL_URL;
+  readonly bitacoraUrl = BITACORA_URL;
 
   // Portales y Sitios
   sitios: any[] = [];
-  
-  // Portales Fijos Base con Logos Oficiales Locales
+
+  readonly gruposMeta: { id: GrupoPortal; titulo: string }[] = [
+    { id: 'senati', titulo: 'SENATI' },
+    { id: 'dev', titulo: 'Desarrollo' },
+    { id: 'herramientas', titulo: 'Herramientas' }
+  ];
+
+  // Portales Fijos Base con Logos Oficiales Locales (agrupados por categoría)
   defaultPortalesFijos: PortalFijo[] = [
     {
       id: 'bb',
-      nombre: 'Blackboard SENATI',
+      nombre: 'Blackboard',
       url: 'https://senati.blackboard.com/',
       icono: '/img/blackboard.svg',
-      descripcion: 'Entregables y clases de SENATI.'
+      descripcion: 'Entregables y clases de SENATI.',
+      grupo: 'senati'
     },
     {
       id: 'outlook',
-      nombre: 'Outlook SENATI',
+      nombre: 'Outlook',
       url: 'https://outlook.cloud.microsoft/mail/',
       icono: '/img/outlook.svg',
-      descripcion: 'Correo institucional de SENATI.'
+      descripcion: 'Correo institucional de SENATI.',
+      grupo: 'senati'
     },
     {
-      id: 'drive',
-      nombre: 'Google Drive',
-      url: 'https://drive.google.com',
-      icono: '/img/drive.svg',
-      descripcion: 'Documentación y archivos en la nube.'
+      id: 'senati-portal',
+      nombre: 'SENATI Portal',
+      url: SENATI_PORTAL_URL,
+      icono: svgIcon('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>', '#38bdf8'),
+      descripcion: 'Cursos y materias.',
+      grupo: 'senati'
+    },
+    {
+      id: 'bitacora',
+      nombre: 'Bitácora',
+      url: BITACORA_URL,
+      icono: svgIcon('<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>', '#34d399'),
+      descripcion: 'Informes semanales (Dual).',
+      grupo: 'senati'
     },
     {
       id: 'github',
       nombre: 'GitHub',
       url: 'https://github.com',
       icono: '/img/github.svg',
-      descripcion: 'Repositorios y control de versiones.'
+      descripcion: 'Repositorios y control de versiones.',
+      grupo: 'dev'
     },
     {
       id: 'vercel',
-      nombre: 'Vercel Dashboard',
+      nombre: 'Vercel',
       url: 'https://vercel.com/dashboard',
       icono: '/img/vercel.svg',
-      descripcion: 'Despliegues y proyectos en producción.'
+      descripcion: 'Despliegues y proyectos en producción.',
+      grupo: 'dev'
     },
     {
       id: 'supabase',
-      nombre: 'Supabase Cloud',
+      nombre: 'Supabase',
       url: 'https://supabase.com/dashboard',
       icono: '/img/supabase.svg',
-      descripcion: 'Base de datos PostgreSQL y Auth.'
+      descripcion: 'Base de datos PostgreSQL y Auth.',
+      grupo: 'dev'
+    },
+    {
+      id: 'drive',
+      nombre: 'Google Drive',
+      url: 'https://drive.google.com',
+      icono: '/img/drive.svg',
+      descripcion: 'Documentación y archivos en la nube.',
+      grupo: 'herramientas'
     },
     {
       id: 'chatgpt',
       nombre: 'ChatGPT',
       url: 'https://chatgpt.com',
       icono: '/img/chatgpt.svg',
-      descripcion: 'Asistente de IA y resolución de dudas.'
+      descripcion: 'Asistente de IA y resolución de dudas.',
+      grupo: 'herramientas'
     },
     {
       id: 'notion',
       nombre: 'Notion',
       url: 'https://notion.so',
       icono: '/img/notion.svg',
-      descripcion: 'Apuntes, gestión y documentación.'
+      descripcion: 'Apuntes, gestión y documentación.',
+      grupo: 'herramientas'
     }
   ];
 
@@ -187,11 +253,6 @@ export class Dashboard implements OnInit, OnDestroy {
 
   filtroTechComandos = 'todos';
 
-  // Resumen de Tareas SENATI
-  tareasSenati: any[] = [];
-  senatiDrawerOpen = false;
-  loadingTareasSenati = false;
-
   // Buscador Rápido Global (Spotlight)
   spotlightOpen = false;
   spotlightQuery = '';
@@ -218,6 +279,14 @@ export class Dashboard implements OnInit, OnDestroy {
     contenido: ''
   };
 
+  // Nota rápida (widget del inicio)
+  notaRapida = {
+    categoria: '',
+    titulo: '',
+    contenido: ''
+  };
+  guardandoNotaRapida = false;
+
   formError = '';
   notaError = '';
 
@@ -229,12 +298,18 @@ export class Dashboard implements OnInit, OnDestroy {
   private toastTimeout?: ReturnType<typeof setTimeout>;
   private clockInterval?: ReturnType<typeof setInterval>;
 
-  // --- SENATI HORARIO & CLASES ---
+  // --- HORARIO & CLASES ---
   cursosSenati: any[] = [];
   clasesHoy: any[] = [];
   claseActual: any = null;
   proximaClase: any = null;
   loadingCursosSenati = false;
+
+  readonly hoyIndex = new Date().getDay();
+  diaSeleccionado = new Date().getDay();
+  clasesDiaSeleccionado: any[] = [];
+  semana: { index: number; label: string; count: number; esHoy: boolean }[] = [];
+  proximaClaseSemana: any = null;
 
   // --- GITHUB WIDGET DEV ---
   githubUsername = localStorage.getItem('central_github_user') || 'Vrak23';
@@ -246,22 +321,15 @@ export class Dashboard implements OnInit, OnDestroy {
   editingGithubUser = false;
   githubInput = '';
   githubTokenInput = '';
-  reposExpandidos = false; // Por defecto minimizados (muestra solo 3)
+  reposExpandidos = false;
 
   get reposVisibles(): any[] {
-    if (this.reposExpandidos) {
-      return this.githubRepos;
-    }
     return this.githubRepos.slice(0, 3);
   }
 
   toggleExpandirRepos() {
     this.reposExpandidos = !this.reposExpandidos;
   }
-
-  // --- ECOSISTEMA URLS (LOCAL & PROD) ---
-  senatiPortalUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:4201' : 'https://senati-portal.vercel.app/';
-  bitacoraUrl = 'https://bitacora-senati.vercel.app/';
 
   constructor(
     private supabaseService: SupabaseService,
@@ -284,9 +352,6 @@ export class Dashboard implements OnInit, OnDestroy {
       }
       if (this.notasPanelOpen) {
         this.cerrarNotas();
-      }
-      if (this.senatiDrawerOpen) {
-        this.cerrarSenatiDrawer();
       }
     } else if (event.key === 'Enter' && this.spotlightOpen) {
       if (this.spotlightResults.length > 0) {
@@ -327,17 +392,6 @@ export class Dashboard implements OnInit, OnDestroy {
     }
   }
 
-  abrirSenatiDrawer() {
-    this.cerrarDropdowns();
-    this.senatiDrawerOpen = true;
-    this.refreshView();
-  }
-
-  cerrarSenatiDrawer() {
-    this.senatiDrawerOpen = false;
-    this.refreshView();
-  }
-
   cerrarDropdowns() {
     const openDetails = document.querySelectorAll('details.hamburger-menu[open]');
     openDetails.forEach(details => details.removeAttribute('open'));
@@ -349,6 +403,12 @@ export class Dashboard implements OnInit, OnDestroy {
     this.loadingApp = true;
     this.updateDateTime();
     this.loadPortalesFijos();
+
+    const savedVista = localStorage.getItem('central_vista_activa') as VistaDashboard;
+    if (savedVista && ['inicio', 'sitios', 'github', 'chuletas'].includes(savedVista)) {
+      this.vistaActiva = savedVista;
+    }
+
     this.clockInterval = setInterval(() => {
       this.updateDateTime();
       this.analizarHorarioSenati();
@@ -360,7 +420,6 @@ export class Dashboard implements OnInit, OnDestroy {
         this.loadUserProfile(),
         this.loadSitios(),
         this.loadNotas(),
-        this.loadTareasSenati(),
         this.loadCursosSenati(),
         this.loadGithubData()
       ]);
@@ -422,50 +481,29 @@ export class Dashboard implements OnInit, OnDestroy {
       weekday: 'long', 
       day: '2-digit', 
       month: 'long', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      year: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit', 
       hour12: false
     };
     
     this.dateTimeString = now.toLocaleDateString('es-ES', options);
   }
 
-  // --- NAVEGACIÓN DE VISTAS ---
-  irACheatsheet() {
+  // --- NAVEGACIÓN DE PESTAÑAS ---
+  cambiarVista(vista: VistaDashboard) {
     this.cerrarDropdowns();
-    this.vistaActiva = 'chuletas';
+    this.vistaActiva = vista;
+    localStorage.setItem('central_vista_activa', vista);
     this.refreshView();
+  }
+
+  irACheatsheet() {
+    this.cambiarVista('chuletas');
   }
 
   irADashboard() {
-    this.cerrarDropdowns();
-    this.vistaActiva = 'dashboard';
-    this.refreshView();
-  }
-
-  // --- SENATI TAREAS SUMMARY ---
-  async loadTareasSenati() {
-    this.loadingTareasSenati = true;
-    try {
-      this.tareasSenati = await this.supabaseService.getTareasSenatiPendientes();
-    } catch (e) {
-      console.warn('Error loading senati tasks summary:', e);
-    } finally {
-      this.loadingTareasSenati = false;
-      this.refreshView();
-    }
-  }
-
-  async marcarTareaEntregada(tareaId: string) {
-    try {
-      await this.supabaseService.updateTareaSenatiEstado(tareaId, 'entregado');
-      this.tareasSenati = this.tareasSenati.filter(t => t.id !== tareaId);
-      this.showToast('¡Tarea completada!');
-      this.refreshView();
-    } catch (err) {
-      console.error(err);
-    }
+    this.cambiarVista('inicio');
   }
 
   formatDateSenati(dateStr: string): string {
@@ -473,7 +511,7 @@ export class Dashboard implements OnInit, OnDestroy {
     return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 
-  // --- SENATI HORARIO & CLASES ---
+  // --- HORARIO & CLASES ---
   async loadCursosSenati() {
     this.loadingCursosSenati = true;
     try {
@@ -487,26 +525,18 @@ export class Dashboard implements OnInit, OnDestroy {
     }
   }
 
-  analizarHorarioSenati() {
-    const ahora = new Date();
-    const diaIndex = ahora.getDay(); // 0: Dom, 1: Lun, 2: Mar, 3: Mié, 4: Jue, 5: Vie, 6: Sáb
+  extraerClasesParaDia(diaIndex: number): any[] {
     const mapDias = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
     const mapDiasAlt = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-    const diaHoyAbbr = mapDias[diaIndex];
-    const diaHoyAlt = mapDiasAlt[diaIndex];
+    const diaAbbr = mapDias[diaIndex];
+    const diaAlt = mapDiasAlt[diaIndex];
 
-    const horaActualMinutos = ahora.getHours() * 60 + ahora.getMinutes();
-
-    this.clasesHoy = [];
-    this.claseActual = null;
-    this.proximaClase = null;
-
+    const clases: any[] = [];
     for (const c of this.cursosSenati) {
       const hStr = (c.horario || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (!hStr) continue;
 
-      // Verificar si coincide con el día de hoy
-      const coincideDia = hStr.includes(diaHoyAbbr) || hStr.includes(diaHoyAlt) || 
+      const coincideDia = hStr.includes(diaAbbr) || hStr.includes(diaAlt) ||
         (!hStr.includes('lun') && !hStr.includes('mar') && !hStr.includes('mie') && !hStr.includes('jue') && !hStr.includes('vie') && !hStr.includes('sab') && diaIndex >= 1 && diaIndex <= 5);
 
       if (coincideDia) {
@@ -529,23 +559,187 @@ export class Dashboard implements OnInit, OnDestroy {
           }
         }
 
-        const claseInfo = {
+        clases.push({
           ...c,
           horaFormateada,
           inicioMin,
           finMin
-        };
+        });
+      }
+    }
 
-        this.clasesHoy.push(claseInfo);
+    clases.sort((a, b) => a.inicioMin - b.inicioMin);
+    return clases;
+  }
 
-        if (horaActualMinutos >= inicioMin && horaActualMinutos <= finMin) {
-          this.claseActual = claseInfo;
-        } else if (horaActualMinutos < inicioMin) {
-          if (!this.proximaClase || inicioMin < this.proximaClase.inicioMin) {
-            this.proximaClase = claseInfo;
-          }
+  analizarHorarioSenati() {
+    const ahora = new Date();
+    const diaIndex = ahora.getDay();
+    const horaActualMinutos = ahora.getHours() * 60 + ahora.getMinutes();
+
+    // Construir semana de Lunes a Sábado
+    const labels = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    this.semana = [1, 2, 3, 4, 5, 6].map(idx => {
+      const clases = this.extraerClasesParaDia(idx);
+      return {
+        index: idx,
+        label: labels[idx],
+        count: clases.length,
+        esHoy: idx === diaIndex
+      };
+    });
+
+    this.clasesHoy = this.extraerClasesParaDia(diaIndex);
+    this.claseActual = null;
+    this.proximaClase = null;
+
+    for (const c of this.clasesHoy) {
+      if (horaActualMinutos >= c.inicioMin && horaActualMinutos <= c.finMin) {
+        this.claseActual = c;
+      } else if (horaActualMinutos < c.inicioMin) {
+        if (!this.proximaClase || c.inicioMin < this.proximaClase.inicioMin) {
+          this.proximaClase = c;
         }
       }
+    }
+
+    this.actualizarClasesDiaSeleccionado();
+    this.buscarProximaClaseSemana(diaIndex, horaActualMinutos);
+  }
+
+  seleccionarDia(diaIndex: number) {
+    this.diaSeleccionado = diaIndex;
+    this.actualizarClasesDiaSeleccionado();
+    this.refreshView();
+  }
+
+  actualizarClasesDiaSeleccionado() {
+    this.clasesDiaSeleccionado = this.extraerClasesParaDia(this.diaSeleccionado);
+  }
+
+  get nombreDiaSeleccionado(): string {
+    return DIAS_NOMBRE[this.diaSeleccionado] || '';
+  }
+
+  buscarProximaClaseSemana(diaActual: number, minutosActual: number) {
+    if (this.proximaClase) {
+      this.proximaClaseSemana = { ...this.proximaClase, diaNombre: 'Hoy' };
+      return;
+    }
+    for (let offset = 1; offset <= 7; offset++) {
+      const targetDia = (diaActual + offset) % 7;
+      const clases = this.extraerClasesParaDia(targetDia);
+      if (clases.length > 0) {
+        this.proximaClaseSemana = {
+          ...clases[0],
+          diaNombre: offset === 1 ? 'Mañana' : DIAS_NOMBRE[targetDia]
+        };
+        return;
+      }
+    }
+    this.proximaClaseSemana = null;
+  }
+
+  // --- PORTALES AGRUPADOS ---
+  get portalesPorGrupo(): GrupoPortales[] {
+    const grupos: GrupoPortales[] = this.gruposMeta.map(g => ({
+      id: g.id,
+      titulo: g.titulo,
+      items: []
+    }));
+
+    this.portalesFijos.forEach(p => {
+      const targetId = p.grupo || 'herramientas';
+      const g = grupos.find(x => x.id === targetId);
+      if (g) {
+        g.items.push({
+          nombre: p.nombre,
+          url: p.url,
+          icono: p.icono,
+          descripcion: p.descripcion,
+          tipo: 'base',
+          ref: p
+        });
+      }
+    });
+
+    this.sitiosFijosCustom.forEach(s => {
+      const g = grupos.find(x => x.id === 'herramientas') || grupos[grupos.length - 1];
+      g.items.push({
+        nombre: s.nombre,
+        url: s.url,
+        icono: s.icono,
+        descripcion: s.descripcion,
+        tipo: 'db',
+        ref: s
+      });
+    });
+
+    return grupos.filter(g => g.items.length > 0);
+  }
+
+  get misSitiosItems(): ItemPortal[] {
+    return this.sitiosPersonales.map(s => ({
+      nombre: s.nombre,
+      url: s.url,
+      icono: s.icono,
+      descripcion: s.descripcion,
+      tipo: 'db',
+      ref: s
+    }));
+  }
+
+  get portalesDestacados(): ItemPortal[] {
+    const list: ItemPortal[] = [];
+    this.portalesFijos.slice(0, 6).forEach(p => {
+      list.push({
+        nombre: p.nombre,
+        url: p.url,
+        icono: p.icono,
+        descripcion: p.descripcion,
+        tipo: 'base',
+        ref: p
+      });
+    });
+    this.sitiosPersonales.slice(0, 2).forEach(s => {
+      list.push({
+        nombre: s.nombre,
+        url: s.url,
+        icono: s.icono,
+        descripcion: s.descripcion,
+        tipo: 'db',
+        ref: s
+      });
+    });
+    return list;
+  }
+
+  get notasRecientes(): any[] {
+    return this.notas.slice(0, 4);
+  }
+
+  async agregarNotaRapida() {
+    const categoria = this.notaRapida.categoria.trim() || 'General';
+    const titulo = this.notaRapida.titulo.trim();
+    const contenido = this.notaRapida.contenido.trim();
+
+    if (!titulo) {
+      this.showToast('El título de la nota es obligatorio');
+      return;
+    }
+
+    this.guardandoNotaRapida = true;
+    try {
+      await this.supabaseService.addNota(categoria, titulo, contenido);
+      this.notaRapida = { categoria: '', titulo: '', contenido: '' };
+      await this.loadNotas();
+      this.showToast('¡Nota guardada! 📝');
+    } catch (err: any) {
+      console.error(err);
+      this.showToast(err.message || 'Error al guardar la nota');
+    } finally {
+      this.guardandoNotaRapida = false;
+      this.refreshView();
     }
   }
 
@@ -666,25 +860,54 @@ export class Dashboard implements OnInit, OnDestroy {
 
     const results: { type: string; title: string; subtitle: string; icon: string; action: () => void }[] = [];
 
-    // Apps
-    if ('senati portal tareas academico'.includes(q)) {
+    // Pestañas / Secciones
+    if ('inicio dashboard home'.includes(q)) {
       results.push({
-        type: 'App',
-        title: 'SENATI Portal',
-        subtitle: 'Tareas, entregas y materias',
+        type: 'Pestaña',
+        title: 'Inicio (Dashboard)',
+        subtitle: 'Clase de hoy, accesos y notas rápidas',
         icon: '',
-        action: () => window.open('https://senati-portal.vercel.app/', '_blank')
+        action: () => this.cambiarVista('inicio')
       });
     }
 
-    // Chuletas
-    if ('chuletas comandos servidores dev terminal'.includes(q)) {
+    if ('sitios portales enlaces links'.includes(q)) {
       results.push({
-        type: 'Sección',
+        type: 'Pestaña',
+        title: 'Portales & Sitios',
+        subtitle: 'Ver todos los accesos agrupados',
+        icon: '',
+        action: () => this.cambiarVista('sitios')
+      });
+    }
+
+    if ('github repos repositorios proyectos code'.includes(q)) {
+      results.push({
+        type: 'Pestaña',
+        title: 'GitHub Workspace',
+        subtitle: 'Ver tus repositorios y proyectos',
+        icon: '',
+        action: () => this.cambiarVista('github')
+      });
+    }
+
+    if ('chuletas comandos servidores dev terminal cheat'.includes(q)) {
+      results.push({
+        type: 'Pestaña',
         title: 'Chuletas & Comandos Dev',
         subtitle: 'Ver catálogo de comandos de servidores',
         icon: '',
-        action: () => this.irACheatsheet()
+        action: () => this.cambiarVista('chuletas')
+      });
+    }
+
+    if ('notas apuntes block'.includes(q)) {
+      results.push({
+        type: 'Herramienta',
+        title: 'Notas Rápidas',
+        subtitle: 'Abrir panel completo de notas',
+        icon: '',
+        action: () => this.abrirNotas()
       });
     }
 

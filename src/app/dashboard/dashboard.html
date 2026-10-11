@@ -17,59 +17,6 @@
 </div>
 
 <!-- ==================================================== -->
-<!-- PANEL DESLIZANTE DE TAREAS SENATI (SLIDE A LA IZQ)   -->
-<!-- ==================================================== -->
-<div 
-  *ngIf="senatiDrawerOpen" 
-  id="senati-overlay" 
-  class="backdrop-fade-in"
-  (click)="cerrarSenatiDrawer()"
-></div>
-
-<div id="senati-drawer" [class.abierto]="senatiDrawerOpen">
-  <div class="drawer-header">
-    <div class="drawer-title-row">
-      <span class="drawer-title">Tareas SENATI</span>
-      <span *ngIf="tareasSenati.length > 0" class="drawer-count-badge">{{ tareasSenati.length }} pendientes</span>
-    </div>
-    <button (click)="cerrarSenatiDrawer()" class="drawer-close-btn" title="Cerrar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-  </div>
-
-  <div class="drawer-content">
-    <div class="drawer-portal-banner">
-      <span>Portal Académico SENATI</span>
-      <a [href]="senatiPortalUrl" target="_blank" class="drawer-portal-link">
-        Abrir portal →
-      </a>
-    </div>
-
-    <!-- Lista de Tareas -->
-    <div class="drawer-tasks-list">
-      <div *ngIf="tareasSenati.length === 0" class="drawer-empty-state">
-        ¡Estás al día! No tienes tareas pendientes.
-      </div>
-
-      <div *ngFor="let t of tareasSenati" class="drawer-task-card">
-        <button 
-          type="button" 
-          (click)="marcarTareaEntregada(t.id)" 
-          class="senati-check-mini" 
-          title="Marcar completada">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </button>
-        <div class="drawer-task-info">
-          <div class="drawer-task-title">{{ t.titulo }}</div>
-          <div class="drawer-task-meta">
-            <span class="drawer-course-tag">{{ t.curso?.nombre || 'General' }}</span>
-            <span class="drawer-date-tag">{{ formatDateSenati(t.fecha_limite) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================================================== -->
 <!-- PANEL LATERAL DE NOTAS                               -->
 <!-- ==================================================== -->
 <div 
@@ -139,11 +86,62 @@
 <header>
   <div class="header-content">
     <div class="header-left">
-      <div class="brand-badge-container" (click)="irADashboard()" style="cursor: pointer;">
+      <div class="brand-badge-container" (click)="cambiarVista('inicio')" style="cursor: pointer;">
         <h1 class="brand-title">CENTRAL HUB</h1>
       </div>
       <div class="date-time">{{ dateTimeString }}</div>
     </div>
+
+    <!-- NAVEGACIÓN PRINCIPAL POR PESTAÑAS -->
+    <nav class="header-nav-tabs" aria-label="Navegación principal">
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="vistaActiva === 'inicio'" 
+        (click)="cambiarVista('inicio')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Inicio</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="vistaActiva === 'sitios'" 
+        (click)="cambiarVista('sitios')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span>Portales & Sitios</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="vistaActiva === 'github'" 
+        (click)="cambiarVista('github')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        <span>GitHub</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="nav-tab-btn" 
+        [class.active]="vistaActiva === 'chuletas'" 
+        (click)="cambiarVista('chuletas')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"/>
+          <line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+        <span>Chuletas Dev</span>
+      </button>
+    </nav>
 
     <div class="header-right">
       <!-- BUSCADOR RÁPIDO TRIGGER (CTRL+K) -->
@@ -155,61 +153,21 @@
         <kbd class="spotlight-kbd">Ctrl K</kbd>
       </button>
 
-      <!-- BOTÓN APPS DROPDOWN -->
-      <details class="hamburger-menu apps-dropdown">
-        <summary class="apps-button" title="Ecosistema de Apps">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 5px; flex-shrink: 0;">
-            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
-          </svg>
-          <span>Apps</span>
-        </summary>
+      <!-- BOTÓN NOTAS RÁPIDAS -->
+      <button (click)="abrirNotas()" class="header-action-btn" title="Notas Rápidas">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span class="header-btn-label">Notas</span>
+      </button>
 
-        <div class="menu-panel apps-panel">
-          <div class="apps-panel-header">
-            <span class="apps-header-title">Ecosistema de Apps</span>
-            <span class="apps-count-badge">2 Activas</span>
-          </div>
-
-          <div class="apps-list">
-            <!-- SENATI PORTAL -->
-            <a [href]="senatiPortalUrl" target="_blank" class="app-item-card">
-              <div class="app-item-icon" style="background: rgba(2, 132, 199, 0.18); color: #38bdf8; display:flex; align-items:center; justify-content:center;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-              </div>
-              <div class="app-item-info">
-                <div class="app-item-name">SENATI Portal</div>
-                <div class="app-item-desc">Tareas, Cursos y Entregas</div>
-              </div>
-              <span class="app-item-badge active">Activo</span>
-            </a>
-
-            <!-- BITÁCORA SENATI -->
-            <a [href]="bitacoraUrl" target="_blank" class="app-item-card">
-              <div class="app-item-icon" style="background: rgba(16, 185, 129, 0.18); color: #34d399; display:flex; align-items:center; justify-content:center;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                </svg>
-              </div>
-              <div class="app-item-info">
-                <div class="app-item-name">Bitácora SENATI</div>
-                <div class="app-item-desc">Informes Semanales (Dual)</div>
-              </div>
-              <span class="app-item-badge active">Activo</span>
-            </a>
-          </div>
-        </div>
-      </details>
-
-      <!-- MENÚ HAMBURGUESA PERFIL / OPCIONES -->
+      <!-- MENÚ PERFIL / OPCIONES -->
       <details class="hamburger-menu">
-        <summary class="hamburger-button" title="Menú">
-          <span></span>
-          <span></span>
-          <span></span>
+        <summary class="avatar-menu-trigger" title="Cuenta y Opciones">
+          <div class="avatar-mini">{{ userInitials }}</div>
         </summary>
 
         <div class="menu-panel">
@@ -221,22 +179,21 @@
             </div>
           </div>
 
-          <!-- BOTÓN TAREAS SENATI EN HAMBURGUESA -->
-          <button (click)="abrirSenatiDrawer()" class="menu-link-btn" title="Ver tareas pendientes de SENATI">
-            <div style="display:flex; align-items:center; gap:0.45rem;">
-              <span>Tareas SENATI</span>
-            </div>
-            <span *ngIf="tareasSenati.length > 0" class="menu-badge-count">{{ tareasSenati.length }}</span>
+          <!-- Enlaces para móviles o acceso rápido -->
+          <button (click)="cambiarVista('inicio'); cerrarDropdowns()" class="menu-link-btn mobile-only-item">
+            <span>Inicio</span>
+          </button>
+          <button (click)="cambiarVista('sitios'); cerrarDropdowns()" class="menu-link-btn mobile-only-item">
+            <span>Portales & Sitios</span>
+          </button>
+          <button (click)="cambiarVista('github'); cerrarDropdowns()" class="menu-link-btn mobile-only-item">
+            <span>GitHub Workspace</span>
+          </button>
+          <button (click)="cambiarVista('chuletas'); cerrarDropdowns()" class="menu-link-btn mobile-only-item">
+            <span>Chuletas Dev</span>
           </button>
 
-          <!-- BOTÓN CHULETAS DEV EN HAMBURGUESA -->
-          <button (click)="irACheatsheet()" class="menu-link-btn" title="Ver chuletas de servidores">
-            <div style="display:flex; align-items:center; gap:0.45rem;">
-              <span>Chuletas Dev</span>
-            </div>
-          </button>
-
-          <button (click)="abrirNotas()" id="btn-notas" title="Notas">Notas Rápidas</button>
+          <button (click)="abrirNotas(); cerrarDropdowns()" id="btn-notas" title="Notas">Notas Rápidas</button>
           <button (click)="onLogout()" class="logout-btn-comp">Cerrar Sesión</button>
         </div>
       </details>
@@ -246,139 +203,351 @@
 
 <div class="container main-container">
   <!-- ==================================================== -->
-  <!-- VISTA 1: DASHBOARD PRINCIPAL                         -->
+  <!-- VISTA 1: INICIO (BENTO LAYOUT INTELIGENTE)           -->
   <!-- ==================================================== -->
-  <main *ngIf="vistaActiva === 'dashboard'" class="dashboard-fade-in">
-    <!-- BANNER SALUDO & ACCESOS RÁPIDOS DINÁMICOS -->
-    <section class="command-hero">
-      <div class="greeting-box">
-        <h2 class="hero-title">{{ saludo }}, <span class="highlight-name">{{ userName }}</span></h2>
-        <p class="hero-subtitle">Centro de comando listo • Informática y Desarrollo Web</p>
-      </div>
-
-      <div class="hero-desktop-trigger-box">
-        <!-- WIDGET DINÁMICO CLASE DE HOY -->
-        <div class="today-class-card" [class.live]="claseActual">
-          <div class="today-card-badge-row">
-            <span class="live-dot" *ngIf="claseActual"></span>
-            <span class="today-badge-label">
-              {{ claseActual ? 'Clase En Vivo' : (proximaClase ? 'Próxima Clase Hoy' : (clasesHoy.length > 0 ? 'Clases de Hoy' : 'Hoy Libre')) }}
-            </span>
-            <span class="today-time-badge" *ngIf="claseActual || proximaClase">
-              {{ (claseActual || proximaClase)?.horaFormateada }}
-            </span>
+  <main *ngIf="vistaActiva === 'inicio'" class="dashboard-fade-in">
+    <div class="bento-layout">
+      <!-- COLUMNA PRINCIPAL (IZQUIERDA) -->
+      <div class="bento-main-col">
+        <!-- 1. HERO CARD CON ESTADO DE CLASE HOY -->
+        <section class="bento-hero-card">
+          <div class="bento-hero-info">
+            <h2 class="hero-title">{{ saludo }}, <span class="highlight-name">{{ userName }}</span></h2>
+            <p class="hero-subtitle">Centro de comando listo • Informática y Desarrollo Web</p>
           </div>
 
-          <div class="today-course-main">
-            <div class="today-course-name">
-              {{ (claseActual || proximaClase)?.nombre || (clasesHoy.length > 0 ? 'Tienes ' + clasesHoy.length + ' materias hoy' : 'Sin clases programadas para hoy') }}
+          <div class="bento-class-status-card" [class.live]="claseActual">
+            <div class="today-card-badge-row">
+              <span class="live-dot" *ngIf="claseActual"></span>
+              <span class="today-badge-label">
+                {{ claseActual ? 'Clase En Vivo' : (proximaClase ? 'Próxima Clase Hoy' : (clasesHoy.length > 0 ? 'Clases de Hoy' : 'Hoy Libre')) }}
+              </span>
+              <span class="today-time-badge" *ngIf="claseActual || proximaClase">
+                {{ (claseActual || proximaClase)?.horaFormateada }}
+              </span>
             </div>
-            <div class="today-course-prof" *ngIf="(claseActual || proximaClase)?.profesor">
-              Docente: {{ (claseActual || proximaClase)?.profesor }}
+
+            <div class="today-course-main">
+              <div class="today-course-name">
+                {{ (claseActual || proximaClase)?.nombre || (clasesHoy.length > 0 ? 'Tienes ' + clasesHoy.length + ' materias hoy' : 'Sin clases programadas para hoy') }}
+              </div>
+              <div class="today-course-prof" *ngIf="(claseActual || proximaClase)?.profesor">
+                Docente: {{ (claseActual || proximaClase)?.profesor }}
+              </div>
+            </div>
+
+            <div class="today-actions-row" *ngIf="claseActual || proximaClase">
+              <a *ngIf="(claseActual || proximaClase)?.link_teams" 
+                 [href]="(claseActual || proximaClase)?.link_teams" 
+                 target="_blank" 
+                 class="btn-today-action btn-teams" 
+                 title="Unirse a reunión Teams">
+                Teams ↗
+              </a>
+              <a *ngIf="(claseActual || proximaClase)?.link_blackboard" 
+                 [href]="(claseActual || proximaClase)?.link_blackboard" 
+                 target="_blank" 
+                 class="btn-today-action btn-bb" 
+                 title="Abrir aula en Blackboard">
+                Blackboard ↗
+              </a>
             </div>
           </div>
+        </section>
 
-          <!-- BOTONES RÁPIDOS TEAMS / BLACKBOARD -->
-          <div class="today-actions-row" *ngIf="claseActual || proximaClase">
-            <a *ngIf="(claseActual || proximaClase)?.link_teams" 
-               [href]="(claseActual || proximaClase)?.link_teams" 
-               target="_blank" 
-               class="btn-today-action btn-teams" 
-               title="Unirse a reunión Teams">
-              Teams ↗
-            </a>
-            <a *ngIf="(claseActual || proximaClase)?.link_blackboard" 
-               [href]="(claseActual || proximaClase)?.link_blackboard" 
-               target="_blank" 
-               class="btn-today-action btn-bb" 
-               title="Abrir aula en Blackboard">
-              Blackboard ↗
-            </a>
+        <!-- 2. HORARIO SEMANAL DINÁMICO (TIMELINE INTERACTIVO) -->
+        <section class="bento-schedule-card">
+          <div class="bento-card-header">
+            <div class="bento-header-left">
+              <span class="bento-icon-badge">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </span>
+              <div>
+                <h3 class="bento-section-title">Horario Semanal</h3>
+                <p class="bento-section-desc">Selecciona un día para ver tus materias y enlaces de conexión</p>
+              </div>
+            </div>
+            <span class="dia-actual-chip">{{ nombreDiaSeleccionado }}</span>
           </div>
-        </div>
 
-        <!-- BOTÓN CUADRADO TRIGGER DESKTOP (SLIDE A LA IZQUIERDA) -->
-        <button 
-          type="button" 
-          (click)="abrirSenatiDrawer()" 
-          class="senati-square-btn" 
-          title="Ver tareas de SENATI">
-          <div class="square-btn-icon-row">
-            <span class="square-btn-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          <!-- Selector de días de la semana -->
+          <div class="week-timeline">
+            <button 
+              *ngFor="let d of semana" 
+              type="button" 
+              class="day-pill-btn" 
+              [class.active]="diaSeleccionado === d.index" 
+              [class.es-hoy]="d.esHoy" 
+              (click)="seleccionarDia(d.index)">
+              <span class="day-pill-name">{{ d.label }}</span>
+              <span class="day-pill-badge" [class.has-classes]="d.count > 0">{{ d.count }}</span>
+            </button>
+          </div>
+
+          <!-- Lista de clases para el día seleccionado -->
+          <div class="schedule-classes-container">
+            <div *ngIf="loadingCursosSenati" class="schedule-empty-state">
+              Cargando horario académico...
+            </div>
+
+            <div *ngIf="!loadingCursosSenati && clasesDiaSeleccionado.length === 0" class="schedule-empty-state">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4; margin-bottom: 0.35rem;">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M8 12h8"/>
               </svg>
-            </span>
-            <span *ngIf="tareasSenati.length > 0" class="square-btn-badge">{{ tareasSenati.length }}</span>
-          </div>
-          <div class="square-btn-texts">
-            <span class="square-btn-title">Tareas SENATI</span>
-            <span class="square-btn-sub">{{ tareasSenati.length > 0 ? (tareasSenati[0].titulo) : 'Sin pendientes' }}</span>
-          </div>
-          <span class="square-btn-arrow">→</span>
-        </button>
-      </div>
-    </section>
+              <span>No tienes clases programadas para el {{ nombreDiaSeleccionado }}.</span>
+            </div>
 
-    <!-- SECCIÓN DE PORTALES & ENLACES -->
-    <section class="dashboard-block">
-      <div class="section-title-row">
+            <div *ngFor="let c of clasesDiaSeleccionado" class="schedule-course-item">
+              <div class="schedule-time-block">
+                <span class="schedule-time-text">{{ c.horaFormateada }}</span>
+                <span class="schedule-status-indicator" *ngIf="c.id === claseActual?.id">En curso</span>
+              </div>
+              <div class="schedule-details-block">
+                <div class="schedule-course-title">{{ c.nombre }}</div>
+                <div class="schedule-course-sub" *ngIf="c.profesor">Docente: {{ c.profesor }}</div>
+              </div>
+              <div class="schedule-links-block">
+                <a *ngIf="c.link_teams" [href]="c.link_teams" target="_blank" class="btn-schedule-link teams-link" title="Reunión Teams">Teams ↗</a>
+                <a *ngIf="c.link_blackboard" [href]="c.link_blackboard" target="_blank" class="btn-schedule-link bb-link" title="Aula Blackboard">Aula ↗</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. ACCESOS RÁPIDOS DESTACADOS -->
+        <section class="bento-portales-card">
+          <div class="bento-card-header">
+            <div class="bento-header-left">
+              <span class="bento-icon-badge">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              </span>
+              <div>
+                <h3 class="bento-section-title">Accesos Rápidos</h3>
+                <p class="bento-section-desc">Tus herramientas y plataformas más utilizadas</p>
+              </div>
+            </div>
+            <button type="button" class="btn-ver-todos-link" (click)="cambiarVista('sitios')">
+              Ver todos →
+            </button>
+          </div>
+
+          <div class="quick-portales-grid">
+            <a *ngFor="let p of portalesDestacados" [href]="p.url" target="_blank" class="quick-portal-item" [title]="p.descripcion">
+              <div class="quick-portal-icon">
+                <img *ngIf="isImageUrl(p.icono); else quickEmoji" [src]="p.icono" [alt]="p.nombre" class="quick-portal-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'"/>
+                <ng-template #quickEmoji>
+                  <span>{{ p.icono }}</span>
+                </ng-template>
+              </div>
+              <div class="quick-portal-info">
+                <span class="quick-portal-name">{{ p.nombre }}</span>
+                <span class="quick-portal-desc">{{ p.descripcion }}</span>
+              </div>
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <!-- COLUMNA LATERAL (DERECHA) -->
+      <aside class="bento-side-col">
+        <!-- 1. WIDGET DE NOTAS RÁPIDAS DIRECTO -->
+        <section class="bento-widget-box">
+          <div class="bento-widget-header">
+            <div class="widget-header-title-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <h4>Nota Rápida</h4>
+            </div>
+            <button type="button" class="btn-widget-action" (click)="abrirNotas()" title="Abrir gestor completo de notas">
+              Panel completo
+            </button>
+          </div>
+
+          <div class="quick-note-form">
+            <input 
+              type="text" 
+              [(ngModel)]="notaRapida.titulo" 
+              placeholder="Título del apunte..." 
+              class="quick-note-input"
+            />
+            <input 
+              type="text" 
+              [(ngModel)]="notaRapida.categoria" 
+              placeholder="Categoría (ej: Angular, DB)" 
+              class="quick-note-input category-input"
+            />
+            <textarea 
+              [(ngModel)]="notaRapida.contenido" 
+              placeholder="Escribe un recordatorio rápido..." 
+              rows="2" 
+              class="quick-note-textarea"
+            ></textarea>
+            <button 
+              type="button" 
+              class="btn-save-quick-note" 
+              [disabled]="guardandoNotaRapida" 
+              (click)="agregarNotaRapida()">
+              {{ guardandoNotaRapida ? 'Guardando...' : '+ Guardar Nota' }}
+            </button>
+          </div>
+
+          <!-- Mini lista de notas recientes -->
+          <div class="quick-notes-list" *ngIf="notasRecientes.length > 0">
+            <div class="quick-notes-subhead">Recientes:</div>
+            <div *ngFor="let n of notasRecientes" class="mini-note-chip" (click)="abrirNotas()">
+              <div class="mini-note-header">
+                <span class="mini-note-title">{{ n.titulo }}</span>
+                <span class="mini-note-tag">{{ n.categoria }}</span>
+              </div>
+              <p class="mini-note-snippet">{{ n.contenido }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. GITHUB SNAPSHOT WIDGET -->
+        <section class="bento-widget-box github-mini-card">
+          <div class="bento-widget-header">
+            <div class="widget-header-title-row">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+              </svg>
+              <h4>GitHub</h4>
+            </div>
+            <button type="button" class="btn-widget-action" (click)="cambiarVista('github')">
+              Ver todos →
+            </button>
+          </div>
+
+          <div class="github-mini-body">
+            <div class="github-user-row">
+              <span class="gh-handle">@{{ githubUsername }}</span>
+              <span class="gh-repo-count" *ngIf="githubRepos.length > 0">{{ githubRepos.length }} repos</span>
+            </div>
+
+            <div *ngIf="loadingGithub" class="gh-mini-status">
+              Cargando repositorios...
+            </div>
+
+            <div *ngIf="!loadingGithub && githubRepos.length === 0" class="gh-mini-status">
+              <span *ngIf="!githubError">Sin repositorios visibles.</span>
+              <span *ngIf="githubError">{{ githubError }}</span>
+            </div>
+
+            <div class="github-mini-list" *ngIf="!loadingGithub && githubRepos.length > 0">
+              <a *ngFor="let repo of reposVisibles" [href]="repo.html_url" target="_blank" class="github-mini-item">
+                <span class="mini-repo-name">{{ repo.name }}</span>
+                <span class="mini-repo-lang" *ngIf="repo.language">
+                  <span class="lang-color-dot" [style.backgroundColor]="getLangColor(repo.language)"></span>
+                  {{ repo.language }}
+                </span>
+              </a>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ==================================================== -->
+  <!-- VISTA 2: PORTALES & SITIOS (AGRUPADOS POR CATEGORÍA) -->
+  <!-- ==================================================== -->
+  <main *ngIf="vistaActiva === 'sitios'" class="dashboard-fade-in">
+    <div class="portales-page-header">
+      <div class="portales-page-title-box">
         <h2 class="clean-section-title">Portales & Sitios</h2>
-        <button (click)="abrirModal()" class="add-btn">+ Agregar sitio</button>
+        <p class="clean-section-subtitle">Accesos directos agrupados por institución, desarrollo y herramientas de trabajo.</p>
+      </div>
+      <button (click)="abrirModal()" class="add-btn">+ Agregar Sitio</button>
+    </div>
+
+    <!-- Grupos de portales fijos / categorizados -->
+    <div *ngFor="let grupo of portalesPorGrupo" class="portales-category-group">
+      <div class="category-group-header">
+        <span class="category-group-tag">{{ grupo.titulo }}</span>
+        <span class="category-group-count">{{ grupo.items.length }} sitios</span>
       </div>
 
-      <!-- Grid Unificado y Espacioso de Portales -->
       <div class="grid">
-        <!-- Portales Fijos -->
-        <div *ngFor="let portal of portalesFijos" class="card card-custom" [id]="'portal-' + portal.id">
+        <div *ngFor="let item of grupo.items" class="card card-custom">
           <div class="card-custom-actions">
-            <button class="btn-card-action btn-editar" (click)="abrirModalEditarPortal(portal, $event)" title="Cambiar logo o editar portal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+            <button 
+              *ngIf="item.tipo === 'base'"
+              class="btn-card-action btn-editar" 
+              (click)="abrirModalEditarPortal(item.ref, $event)" 
+              title="Cambiar logo o editar portal">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <button 
+              *ngIf="item.tipo === 'db'"
+              class="btn-card-action btn-editar" 
+              (click)="abrirModalEditar(item.ref, $event)" 
+              title="Editar sitio">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <button 
+              *ngIf="item.tipo === 'db'"
+              class="btn-card-action btn-eliminar" 
+              (click)="eliminarSitio(item.ref.id)" 
+              title="Eliminar sitio">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
-          <a [href]="portal.url" target="_blank" class="card-link">
+
+          <a [href]="item.url" target="_blank" class="card-link">
             <div class="card-logo-dyn">
-              <img *ngIf="isImageUrl(portal.icono); else showFixedEmoji" [src]="portal.icono" [alt]="portal.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'">
-              <ng-template #showFixedEmoji>
-                <span class="dyn-icon-emoji">{{ portal.icono }}</span>
+              <img *ngIf="isImageUrl(item.icono); else showEmojiItem" [src]="item.icono" [alt]="item.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
+              <ng-template #showEmojiItem>
+                <span class="dyn-icon-emoji">{{ item.icono }}</span>
               </ng-template>
             </div>
             <div class="card-info">
-              <div class="card-title">{{ portal.nombre }}</div>
-              <p>{{ portal.descripcion }}</p>
+              <div class="card-title">{{ item.nombre }}</div>
+              <p class="card-url">{{ item.descripcion || item.url }}</p>
             </div>
           </a>
         </div>
+      </div>
+    </div>
 
-        <!-- Sitios Extras / Fijos desde Supabase -->
-        <div *ngFor="let sitio of sitiosFijosCustom" class="card card-custom" [id]="'sitio-' + sitio.id">
-          <div class="card-custom-actions">
-            <button class="btn-card-action btn-editar" (click)="abrirModalEditar(sitio, $event)" title="Editar portal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
-            <button class="btn-card-action btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar portal"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <a [href]="sitio.url" target="_blank" class="card-link">
-            <div class="card-logo-dyn">
-              <img *ngIf="isImageUrl(sitio.icono); else showEmojiFijo" [src]="sitio.icono" [alt]="sitio.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
-              <ng-template #showEmojiFijo>
-                <span class="dyn-icon-emoji">{{ sitio.icono }}</span>
-              </ng-template>
-            </div>
-            <div class="card-info">
-              <div class="card-title">{{ sitio.nombre }}</div>
-              <p class="card-url">{{ sitio.descripcion || sitio.url }}</p>
-            </div>
-          </a>
-        </div>
+    <!-- Categoría: Mis Sitios Personales -->
+    <div class="portales-category-group">
+      <div class="category-group-header">
+        <span class="category-group-tag">Mis Sitios Personales</span>
+        <span class="category-group-count">{{ sitiosPersonales.length }} sitios</span>
+      </div>
 
-        <!-- Sitios Personales -->
+      <div *ngIf="sitiosPersonales.length === 0" class="category-empty-card">
+        <p>No tienes sitios personales agregados aún.</p>
+        <button type="button" class="btn-agregar-inline" (click)="abrirModal()">+ Agregar tu primer sitio</button>
+      </div>
+
+      <div class="grid" *ngIf="sitiosPersonales.length > 0">
         <div *ngFor="let sitio of sitiosPersonales" class="card card-custom" [id]="'sitio-' + sitio.id">
           <div class="card-custom-actions">
-            <button class="btn-card-action btn-editar" (click)="abrirModalEditar(sitio, $event)" title="Editar sitio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
-            <button class="btn-card-action btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar sitio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <button class="btn-card-action btn-editar" (click)="abrirModalEditar(sitio, $event)" title="Editar sitio">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <button class="btn-card-action btn-eliminar" (click)="eliminarSitio(sitio.id)" title="Eliminar sitio">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
           <a [href]="sitio.url" target="_blank" class="card-link">
             <div class="card-logo-dyn">
-              <img *ngIf="isImageUrl(sitio.icono); else showEmoji" [src]="sitio.icono" [alt]="sitio.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
-              <ng-template #showEmoji>
+              <img *ngIf="isImageUrl(sitio.icono); else showEmojiPers" [src]="sitio.icono" [alt]="sitio.nombre" class="dyn-icon-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2201/2201550.png'" />
+              <ng-template #showEmojiPers>
                 <span class="dyn-icon-emoji">{{ sitio.icono }}</span>
               </ng-template>
             </div>
@@ -389,29 +558,30 @@
           </a>
         </div>
       </div>
-    </section>
+    </div>
+  </main>
 
-    <!-- SECCIÓN GITHUB DEV REPOSITORIOS -->
+  <!-- ==================================================== -->
+  <!-- VISTA 3: GITHUB WORKSPACE DEDICADO                   -->
+  <!-- ==================================================== -->
+  <main *ngIf="vistaActiva === 'github'" class="dashboard-fade-in">
     <section class="dashboard-block github-section">
       <div class="section-title-row gh-section-title-row">
         <div class="github-heading-left">
           <span class="github-brand-icon" style="display:flex; align-items:center;">
-            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
             </svg>
           </span>
-          <h2 class="clean-section-title">GitHub Repositorios</h2>
+          <h2 class="clean-section-title">GitHub Workspace</h2>
           <span class="github-handle-badge" *ngIf="githubUser">@{{ githubUser.login }}</span>
           <span class="github-count-badge" *ngIf="githubRepos.length > 0">
-            {{ reposExpandidos ? (githubRepos.length + ' repos') : (reposVisibles.length + ' de ' + githubRepos.length) }}
+            {{ githubRepos.length }} repositorios
           </span>
         </div>
 
         <div class="github-heading-right">
-          <button *ngIf="githubRepos.length > 3" (click)="toggleExpandirRepos()" class="btn-gh-toggle-mini" [title]="reposExpandidos ? 'Minimizar a 3' : 'Desplegar todos'">
-            {{ reposExpandidos ? '▲ Minimizar' : '▼ Ver todos (' + githubRepos.length + ')' }}
-          </button>
-          <button *ngIf="!editingGithubUser" (click)="iniciarEdicionGithub()" class="btn-gh-config" title="Cambiar usuario de GitHub">
+          <button *ngIf="!editingGithubUser" (click)="iniciarEdicionGithub()" class="btn-gh-config" title="Cambiar usuario o configurar PAT">
             @{{ githubUsername }}
           </button>
           <a href="https://github.com/new" target="_blank" class="add-btn">+ Nuevo Repo</a>
@@ -453,9 +623,9 @@
         </p>
       </div>
 
-      <!-- GRID DE REPOSITORIOS RECIENTES (MINIMIZADOS POR DEFECTO A 3) -->
+      <!-- GRID COMPLETO DE REPOSITORIOS GITHUB -->
       <div class="github-repos-grid" *ngIf="!loadingGithub && githubRepos.length > 0">
-        <a *ngFor="let repo of reposVisibles" [href]="repo.html_url" target="_blank" class="github-repo-card">
+        <a *ngFor="let repo of githubRepos" [href]="repo.html_url" target="_blank" class="github-repo-card">
           <div class="repo-card-top">
             <div class="repo-title-box">
               <span class="repo-book-icon" style="display:inline-flex; align-items:center;">
@@ -479,16 +649,6 @@
             <span class="repo-date">{{ formatDateSenati(repo.updated_at) }}</span>
           </div>
         </a>
-      </div>
-
-      <!-- BOTÓN PRINCIPAL PARA DESPLEGAR TODOS / MINIMIZAR -->
-      <div class="github-toggle-container" *ngIf="!loadingGithub && githubRepos.length > 3">
-        <button (click)="toggleExpandirRepos()" class="btn-toggle-repos" [class.expanded]="reposExpandidos">
-          <span class="toggle-icon">{{ reposExpandidos ? '▲' : '▼' }}</span>
-          <span class="toggle-text">
-            {{ reposExpandidos ? 'Minimizar repositorios (mostrar solo 3 recientes)' : 'Desplegar todos los repositorios (' + githubRepos.length + ')' }}
-          </span>
-        </button>
       </div>
     </section>
   </main>
