@@ -64,22 +64,15 @@
   animation: splashSpin 3s linear infinite;
 }
 
-.splash-brand-badge {
+.splash-brand-img {
   position: relative;
   z-index: 2;
   width: 64px;
   height: 64px;
-  background: #12121a;
-  border: 1.5px solid rgba(249, 115, 22, 0.5);
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #f97316;
-  font-weight: 800;
-  font-size: 1.4rem;
-  letter-spacing: -0.02em;
+  object-fit: cover;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  border: 1.5px solid rgba(249, 115, 22, 0.45);
 }
 
 .splash-title {
@@ -236,7 +229,19 @@ header {
 }
 
 .brand-badge-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
+}
+
+.header-brand-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(249, 115, 22, 0.4);
 }
 
 .brand-title {
