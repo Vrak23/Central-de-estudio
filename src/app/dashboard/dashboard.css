@@ -943,6 +943,12 @@ header {
   margin: 0;
 }
 
+.bento-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .dia-actual-chip {
   font-size: 0.7rem;
   font-weight: 700;
@@ -954,11 +960,34 @@ header {
   white-space: nowrap;
 }
 
-/* Selector Interactivo de Días (Lunes a Sábado) */
+.btn-add-schedule-class {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.6rem;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  border-radius: 7px;
+  color: #f97316;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-add-schedule-class:hover {
+  background: #f97316;
+  color: #ffffff;
+  border-color: #f97316;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+}
+
+/* Selector Interactivo de Días (Lunes a Domingo) */
 .week-timeline {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.4rem;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
 }
 
 .day-pill-btn {
@@ -1042,6 +1071,25 @@ header {
   text-align: center;
 }
 
+.btn-schedule-empty-add {
+  margin-top: 0.65rem;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  border-radius: 7px;
+  color: #f97316;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-schedule-empty-add:hover {
+  background: #f97316;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 .schedule-course-item {
   display: flex;
   align-items: center;
@@ -1050,6 +1098,7 @@ header {
   padding: 0.65rem 0.85rem;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
+  border-left: 3.5px solid #f97316;
   border-radius: 9px;
   transition: all 0.15s ease;
 }
@@ -1057,6 +1106,7 @@ header {
 .schedule-course-item:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(249, 115, 22, 0.3);
+  transform: translateX(2px);
 }
 
 .schedule-time-block {
@@ -1138,6 +1188,38 @@ header {
 .bb-link:hover {
   background: rgba(249, 115, 22, 0.3);
   color: #ffffff;
+}
+
+.schedule-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.25rem;
+}
+
+.btn-schedule-item-icon {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 0.28rem 0.38rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-schedule-item-icon.edit:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.btn-schedule-item-icon.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
 }
 
 /* 3. Bento Accesos Rápidos */
@@ -2079,9 +2161,10 @@ header {
 }
 
 /* =================================================== */
-/* MODAL AGREGAR / EDITAR SITIO & LOGO UPLOAD          */
+/* MODAL AGREGAR / EDITAR SITIO & CLASE DE HORARIO     */
 /* =================================================== */
-#modal-overlay {
+#modal-overlay,
+#modal-clase-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -2096,7 +2179,8 @@ header {
   padding: 1rem;
 }
 
-#modal-box {
+#modal-box,
+#modal-clase-box {
   background: #141419;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
@@ -2330,6 +2414,115 @@ header {
 
 .btn-cancelar:hover {
   color: #ffffff;
+}
+
+/* Estilos específicos del Modal de Clases del Horario */
+.modal-dias-pills {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.modal-dia-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.modal-dia-pill:hover {
+  border-color: rgba(249, 115, 22, 0.4);
+  color: #ffffff;
+}
+
+.modal-dia-pill.active {
+  background: #f97316;
+  border-color: #f97316;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.modal-fields-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.input-time-picker {
+  font-family: inherit;
+  color-scheme: dark;
+}
+
+.modal-colors-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.15rem;
+}
+
+.modal-color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.modal-color-dot:hover {
+  transform: scale(1.18);
+}
+
+.modal-color-dot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  transform: scale(1.18);
+}
+
+.modal-actions-space {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.btn-eliminar-modal {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  padding: 0.45rem 0.85rem;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-eliminar-modal:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.required-star {
+  color: #f97316;
+  margin-left: 2px;
 }
 
 /* =================================================== */

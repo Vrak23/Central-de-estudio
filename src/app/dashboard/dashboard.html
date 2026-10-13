@@ -310,7 +310,16 @@
                 <p class="bento-section-desc">Selecciona un día para ver tus materias y enlaces de conexión</p>
               </div>
             </div>
-            <span class="dia-actual-chip">{{ nombreDiaSeleccionado }}</span>
+            <div class="bento-header-actions">
+              <span class="dia-actual-chip">{{ nombreDiaSeleccionado }}</span>
+              <button type="button" class="btn-add-schedule-class" (click)="abrirModalAgregarClase()" title="Programar o añadir una nueva clase">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Clase</span>
+              </button>
+            </div>
           </div>
 
           <!-- Selector de días de la semana -->
@@ -339,9 +348,12 @@
                 <path d="M8 12h8"/>
               </svg>
               <span>No tienes clases programadas para el {{ nombreDiaSeleccionado }}.</span>
+              <button type="button" class="btn-schedule-empty-add" (click)="abrirModalAgregarClase()">
+                + Programar clase el {{ nombreDiaSeleccionado }}
+              </button>
             </div>
 
-            <div *ngFor="let c of clasesDiaSeleccionado" class="schedule-course-item">
+            <div *ngFor="let c of clasesDiaSeleccionado" class="schedule-course-item" [style.border-left-color]="c.color || '#f97316'">
               <div class="schedule-time-block">
                 <span class="schedule-time-text">{{ c.horaFormateada }}</span>
                 <span class="schedule-status-indicator" *ngIf="c.id === claseActual?.id">En curso</span>
@@ -353,6 +365,20 @@
               <div class="schedule-links-block">
                 <a *ngIf="c.link_teams" [href]="c.link_teams" target="_blank" class="btn-schedule-link teams-link" title="Reunión Teams">Teams ↗</a>
                 <a *ngIf="c.link_blackboard" [href]="c.link_blackboard" target="_blank" class="btn-schedule-link bb-link" title="Aula Blackboard">Aula ↗</a>
+                <div class="schedule-item-actions">
+                  <button type="button" class="btn-schedule-item-icon edit" (click)="abrirModalEditarClase(c, $event)" title="Editar materia u horario">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                  </button>
+                  <button type="button" class="btn-schedule-item-icon delete" (click)="eliminarClase(c, $event)" title="Eliminar clase del horario">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -873,6 +899,145 @@
         {{ (portalFijoEnEdicion || sitioEnEdicion) ? 'Guardar cambios' : 'Guardar sitio' }}
       </button>
       <button class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PARA AGREGAR / EDITAR CLASE DEL HORARIO -->
+<div *ngIf="modalClaseOpen" id="modal-clase-overlay" class="modal-overlay-backdrop">
+  <div id="modal-clase-box" class="modal-card-box">
+    <div class="modal-top-bar">
+      <h3>{{ claseEnEdicion ? 'Editar Clase del Horario' : 'Programar Nueva Clase' }}</h3>
+      <button class="modal-close-icon-btn" (click)="cerrarModalClase()" title="Cerrar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Nombre del Curso / Materia con datalist de sugerencias autocompletadas -->
+    <div class="modal-field">
+      <label for="clase-nombre">Materia o Curso <span class="required-star">*</span></label>
+      <input 
+        type="text" 
+        id="clase-nombre" 
+        [(ngModel)]="formClase.nombre" 
+        (ngModelChange)="onNombreCursoInput($event)"
+        list="cursos-senati-list"
+        placeholder="Ej: Desarrollo Backend con Node.js" 
+      />
+      <datalist id="cursos-senati-list">
+        <option *ngFor="let n of nombresCursosDisponibles" [value]="n"></option>
+      </datalist>
+    </div>
+
+    <!-- Día de la semana (Selector de pills intuitivo) -->
+    <div class="modal-field">
+      <label>Día de la Semana <span class="required-star">*</span></label>
+      <div class="modal-dias-pills">
+        <button 
+          *ngFor="let d of diasSemanaOpciones" 
+          type="button" 
+          class="modal-dia-pill" 
+          [class.active]="formClase.dia === d.index" 
+          (click)="formClase.dia = d.index">
+          {{ d.abbr }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Horarios (Inicio y Fin) en grid de 2 columnas -->
+    <div class="modal-fields-row">
+      <div class="modal-field flex-1">
+        <label for="clase-inicio">Hora Inicio <span class="required-star">*</span></label>
+        <input 
+          type="time" 
+          id="clase-inicio" 
+          [(ngModel)]="formClase.horaInicio" 
+          class="input-time-picker" 
+        />
+      </div>
+      <div class="modal-field flex-1">
+        <label for="clase-fin">Hora Fin</label>
+        <input 
+          type="time" 
+          id="clase-fin" 
+          [(ngModel)]="formClase.horaFin" 
+          class="input-time-picker" 
+        />
+      </div>
+    </div>
+
+    <!-- Profesor -->
+    <div class="modal-field">
+      <label for="clase-profesor">Docente / Profesor</label>
+      <input 
+        type="text" 
+        id="clase-profesor" 
+        [(ngModel)]="formClase.profesor" 
+        placeholder="Ej: Ing. Carlos Pérez" 
+      />
+    </div>
+
+    <!-- Enlaces (Teams & Blackboard) -->
+    <div class="modal-field">
+      <label for="clase-teams">Enlace Teams / Reunión</label>
+      <input 
+        type="url" 
+        id="clase-teams" 
+        [(ngModel)]="formClase.linkTeams" 
+        placeholder="https://teams.microsoft.com/l/meetup-join/..." 
+      />
+    </div>
+
+    <div class="modal-field">
+      <label for="clase-bb">Enlace Blackboard / Aula Virtual</label>
+      <input 
+        type="url" 
+        id="clase-bb" 
+        [(ngModel)]="formClase.linkBlackboard" 
+        placeholder="https://senati.blackboard.com/ultra/courses/..." 
+      />
+    </div>
+
+    <!-- Selector de Color / Distintivo -->
+    <div class="modal-field">
+      <label>Color Distintivo</label>
+      <div class="modal-colors-row">
+        <button 
+          *ngFor="let color of coloresClase" 
+          type="button" 
+          class="modal-color-dot" 
+          [style.background-color]="color" 
+          [class.active]="formClase.color === color" 
+          (click)="formClase.color = color">
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <p *ngIf="claseError" class="form-error-text">{{ claseError }}</p>
+
+    <!-- Botones de Acción -->
+    <div class="modal-actions modal-actions-space">
+      <button 
+        *ngIf="claseEnEdicion" 
+        type="button" 
+        class="btn-eliminar-modal" 
+        (click)="eliminarClase(claseEnEdicion)">
+        Eliminar
+      </button>
+      <div class="modal-actions-right">
+        <button type="button" class="btn-cancelar" (click)="cerrarModalClase()">Cancelar</button>
+        <button 
+          type="button" 
+          class="btn-guardar" 
+          [disabled]="guardandoClase" 
+          (click)="guardarClase()">
+          {{ guardandoClase ? 'Guardando...' : (claseEnEdicion ? 'Actualizar Clase' : 'Guardar Clase') }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

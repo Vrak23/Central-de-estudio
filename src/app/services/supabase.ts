@@ -237,4 +237,72 @@ export class SupabaseService {
     }
     return data || [];
   }
+
+  async addCursoSenati(curso: {
+    nombre: string;
+    horario: string;
+    profesor?: string;
+    link_teams?: string;
+    link_blackboard?: string;
+    color?: string;
+  }) {
+    const user = await this.getUser();
+    if (!user) throw new Error('Usuario no autenticado');
+
+    const { data, error } = await this.supabase
+      .from('senati_cursos')
+      .insert([
+        {
+          usuario_id: user.id,
+          nombre: curso.nombre,
+          horario: curso.horario,
+          profesor: curso.profesor || null,
+          link_teams: curso.link_teams || null,
+          link_blackboard: curso.link_blackboard || null,
+          color: curso.color || '#f97316',
+          semestre: 4
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async updateCursoSenati(id: string, curso: {
+    nombre: string;
+    horario: string;
+    profesor?: string;
+    link_teams?: string;
+    link_blackboard?: string;
+    color?: string;
+  }) {
+    const { data, error } = await this.supabase
+      .from('senati_cursos')
+      .update({
+        nombre: curso.nombre,
+        horario: curso.horario,
+        profesor: curso.profesor || null,
+        link_teams: curso.link_teams || null,
+        link_blackboard: curso.link_blackboard || null,
+        color: curso.color || '#f97316'
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteCursoSenati(id: string) {
+    const { error } = await this.supabase
+      .from('senati_cursos')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
 }
+

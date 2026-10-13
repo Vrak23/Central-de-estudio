@@ -311,6 +311,44 @@ export class Dashboard implements OnInit, OnDestroy {
   semana: { index: number; label: string; count: number; esHoy: boolean }[] = [];
   proximaClaseSemana: any = null;
 
+  // Modal para Crear / Editar Clase del Horario
+  modalClaseOpen = false;
+  claseEnEdicion: any = null;
+  guardandoClase = false;
+  claseError = '';
+
+  readonly diasSemanaOpciones = [
+    { index: 1, nombre: 'Lunes', abbr: 'Lun' },
+    { index: 2, nombre: 'Martes', abbr: 'Mar' },
+    { index: 3, nombre: 'Miércoles', abbr: 'Mié' },
+    { index: 4, nombre: 'Jueves', abbr: 'Jue' },
+    { index: 5, nombre: 'Viernes', abbr: 'Vie' },
+    { index: 6, nombre: 'Sábado', abbr: 'Sáb' },
+    { index: 0, nombre: 'Domingo', abbr: 'Dom' }
+  ];
+
+  readonly coloresClase = [
+    '#f97316',
+    '#38bdf8',
+    '#10b981',
+    '#a855f7',
+    '#f59e0b',
+    '#ef4444',
+    '#06b6d4'
+  ];
+
+  formClase = {
+    id: '',
+    nombre: '',
+    dia: 1,
+    horaInicio: '08:00',
+    horaFin: '12:00',
+    profesor: '',
+    linkTeams: '',
+    linkBlackboard: '',
+    color: '#f97316'
+  };
+
   // --- GITHUB WIDGET DEV ---
   githubUsername = localStorage.getItem('central_github_user') || 'Vrak23';
   githubToken = localStorage.getItem('central_github_token') || '';
@@ -450,6 +488,9 @@ export class Dashboard implements OnInit, OnDestroy {
       if (this.modalAddSitioOpen) {
         this.cerrarModal();
       }
+      if (this.modalClaseOpen) {
+        this.cerrarModalClase();
+      }
       if (this.notasPanelOpen) {
         this.cerrarNotas();
       }
@@ -489,6 +530,11 @@ export class Dashboard implements OnInit, OnDestroy {
     // 2. Cerrar modal de agregar sitio si se hace clic en el fondo exterior
     if (this.modalAddSitioOpen && target && target.id === 'modal-overlay') {
       this.cerrarModal();
+    }
+
+    // 3. Cerrar modal de agregar/editar clase si se hace clic en el fondo exterior
+    if (this.modalClaseOpen && target && target.id === 'modal-clase-overlay') {
+      this.cerrarModalClase();
     }
   }
 
@@ -625,10 +671,26 @@ export class Dashboard implements OnInit, OnDestroy {
   async loadCursosSenati() {
     this.loadingCursosSenati = true;
     try {
-      this.cursosSenati = await this.supabaseService.getCursosSenati();
+      const data = await this.supabaseService.getCursosSenati();
+      if (data && data.length > 0) {
+        this.cursosSenati = data;
+        localStorage.setItem('central_cursos_senati', JSON.stringify(data));
+      } else {
+        const cached = localStorage.getItem('central_cursos_senati');
+        if (cached) {
+          this.cursosSenati = JSON.parse(cached);
+        } else {
+          this.cursosSenati = data || [];
+        }
+      }
       this.analizarHorarioSenati();
     } catch (e) {
       console.warn('Error cargando cursos senati:', e);
+      const cached = localStorage.getItem('central_cursos_senati');
+      if (cached) {
+        this.cursosSenati = JSON.parse(cached);
+        this.analizarHorarioSenati();
+      }
     } finally {
       this.loadingCursosSenati = false;
       this.refreshView();
@@ -647,7 +709,7 @@ export class Dashboard implements OnInit, OnDestroy {
       if (!hStr) continue;
 
       const coincideDia = hStr.includes(diaAbbr) || hStr.includes(diaAlt) ||
-        (!hStr.includes('lun') && !hStr.includes('mar') && !hStr.includes('mie') && !hStr.includes('jue') && !hStr.includes('vie') && !hStr.includes('sab') && diaIndex >= 1 && diaIndex <= 5);
+        (!hStr.includes('lun') && !hStr.includes('mar') && !hStr.includes('mie') && !hStr.includes('jue') && !hStr.includes('vie') && !hStr.includes('sab') && !hStr.includes('dom') && diaIndex >= 1 && diaIndex <= 5);
 
       if (coincideDia) {
         const timeMatches = hStr.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/g);
@@ -687,9 +749,9 @@ export class Dashboard implements OnInit, OnDestroy {
     const diaIndex = ahora.getDay();
     const horaActualMinutos = ahora.getHours() * 60 + ahora.getMinutes();
 
-    // Construir semana de Lunes a Sábado
+    // Construir semana de Lunes a Domingo
     const labels = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    this.semana = [1, 2, 3, 4, 5, 6].map(idx => {
+    this.semana = [1, 2, 3, 4, 5, 6, 0].map(idx => {
       const clases = this.extraerClasesParaDia(idx);
       return {
         index: idx,
@@ -748,6 +810,180 @@ export class Dashboard implements OnInit, OnDestroy {
       }
     }
     this.proximaClaseSemana = null;
+  }
+
+  // --- GESTIÓN / MODIFICACIÓN DEL HORARIO ---
+  abrirModalAgregarClase() {
+    this.claseEnEdicion = null;
+    this.claseError = '';
+    this.formClase = {
+      id: '',
+      nombre: '',
+      dia: this.diaSeleccionado,
+      horaInicio: '08:00',
+      horaFin: '12:00',
+      profesor: '',
+      linkTeams: '',
+      linkBlackboard: '',
+      color: '#f97316'
+    };
+    this.modalClaseOpen = true;
+    this.refreshView();
+  }
+
+  abrirModalEditarClase(c: any, event?: Event) {
+    if (event) event.stopPropagation();
+    this.claseEnEdicion = c;
+    this.claseError = '';
+
+    // Detectar día
+    let diaDetectado = this.diaSeleccionado;
+    const hStr = (c.horario || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const mapDias = ['dom', 'lun', 'mar', 'mie', 'jue', 'vie', 'sab'];
+    for (let i = 0; i < mapDias.length; i++) {
+      if (hStr.includes(mapDias[i])) {
+        diaDetectado = i;
+        break;
+      }
+    }
+
+    // Detectar horas
+    const timeMatches = (c.horario || '').match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/g);
+    let horaInicio = '08:00';
+    let horaFin = '12:00';
+    if (timeMatches && timeMatches.length >= 1) {
+      horaInicio = timeMatches[0].padStart(5, '0');
+      if (timeMatches.length >= 2) {
+        horaFin = timeMatches[1].padStart(5, '0');
+      } else {
+        const [h, m] = horaInicio.split(':').map(Number);
+        const hFinCalc = Math.min(23, h + 3);
+        horaFin = `${String(hFinCalc).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      }
+    }
+
+    this.formClase = {
+      id: c.id,
+      nombre: c.nombre || '',
+      dia: diaDetectado,
+      horaInicio,
+      horaFin,
+      profesor: c.profesor || '',
+      linkTeams: c.link_teams || '',
+      linkBlackboard: c.link_blackboard || '',
+      color: c.color || '#f97316'
+    };
+    this.modalClaseOpen = true;
+    this.refreshView();
+  }
+
+  cerrarModalClase() {
+    this.modalClaseOpen = false;
+    this.claseEnEdicion = null;
+    this.claseError = '';
+    this.refreshView();
+  }
+
+  onNombreCursoInput(nombre: string) {
+    const cursoExistente = this.cursosSenati.find(
+      c => c.nombre?.toLowerCase().trim() === nombre.toLowerCase().trim()
+    );
+    if (cursoExistente) {
+      if (!this.formClase.profesor && cursoExistente.profesor) {
+        this.formClase.profesor = cursoExistente.profesor;
+      }
+      if (!this.formClase.linkTeams && cursoExistente.link_teams) {
+        this.formClase.linkTeams = cursoExistente.link_teams;
+      }
+      if (!this.formClase.linkBlackboard && cursoExistente.link_blackboard) {
+        this.formClase.linkBlackboard = cursoExistente.link_blackboard;
+      }
+      if (cursoExistente.color) {
+        this.formClase.color = cursoExistente.color;
+      }
+    }
+  }
+
+  get nombresCursosDisponibles(): string[] {
+    const set = new Set<string>();
+    this.cursosSenati.forEach(c => {
+      if (c.nombre) set.add(c.nombre.trim());
+    });
+    return Array.from(set);
+  }
+
+  async guardarClase() {
+    if (!this.formClase.nombre.trim()) {
+      this.claseError = 'El nombre de la materia es obligatorio.';
+      return;
+    }
+    if (!this.formClase.horaInicio) {
+      this.claseError = 'La hora de inicio es obligatoria.';
+      return;
+    }
+
+    const diaEncontrado = this.diasSemanaOpciones.find(d => d.index === this.formClase.dia);
+    const diaNombre = diaEncontrado ? diaEncontrado.nombre : DIAS_NOMBRE[this.formClase.dia] || 'Lunes';
+    const horarioStr = this.formClase.horaFin
+      ? `${diaNombre} ${this.formClase.horaInicio} - ${this.formClase.horaFin}`
+      : `${diaNombre} ${this.formClase.horaInicio}`;
+
+    this.guardandoClase = true;
+    this.claseError = '';
+
+    try {
+      if (this.claseEnEdicion && this.formClase.id) {
+        await this.supabaseService.updateCursoSenati(this.formClase.id, {
+          nombre: this.formClase.nombre.trim(),
+          horario: horarioStr,
+          profesor: this.formClase.profesor.trim(),
+          link_teams: this.formClase.linkTeams.trim(),
+          link_blackboard: this.formClase.linkBlackboard.trim(),
+          color: this.formClase.color
+        });
+        this.showToast('¡Clase actualizada correctamente! 📅');
+      } else {
+        await this.supabaseService.addCursoSenati({
+          nombre: this.formClase.nombre.trim(),
+          horario: horarioStr,
+          profesor: this.formClase.profesor.trim(),
+          link_teams: this.formClase.linkTeams.trim(),
+          link_blackboard: this.formClase.linkBlackboard.trim(),
+          color: this.formClase.color
+        });
+        this.showToast('¡Clase agregada al horario! 📅');
+      }
+
+      this.cerrarModalClase();
+      await this.loadCursosSenati();
+    } catch (err: any) {
+      console.error('Error al guardar clase:', err);
+      this.claseError = err.message || 'Error al guardar la clase.';
+    } finally {
+      this.guardandoClase = false;
+      this.refreshView();
+    }
+  }
+
+  async eliminarClase(clase: any, event?: Event) {
+    if (event) event.stopPropagation();
+    const nombre = clase?.nombre || 'esta clase';
+    const confirmar = confirm(`¿Estás seguro de eliminar "${nombre}" del horario?`);
+    if (!confirmar) return;
+
+    try {
+      await this.supabaseService.deleteCursoSenati(clase.id);
+      this.showToast('Clase eliminada del horario');
+      if (this.modalClaseOpen) {
+        this.cerrarModalClase();
+      }
+      await this.loadCursosSenati();
+    } catch (err: any) {
+      console.error('Error al eliminar clase:', err);
+      this.showToast(err.message || 'Error al eliminar la clase');
+    } finally {
+      this.refreshView();
+    }
   }
 
   // --- PORTALES AGRUPADOS ---
